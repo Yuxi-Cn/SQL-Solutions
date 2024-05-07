@@ -1,0 +1,14 @@
+197. Rising Temperature
+
+- Solution 1.
+select t1.id
+from Weather t1
+left join Weather t2 on t1.recordDate 
+= date_add(t2.recordDate, interval 1 day)
+where t1.temperature > t2.temperature
+
+- Solution 2. (PostgreSQL)
+select a.id
+from weather a, weather b
+where b.recordDate + interval '1 day' = a.recordDate
+and a.temperature > b.temperature
