@@ -1,0 +1,43 @@
+1225. Report Contiguous Dates
+
+- Solution 1.
+with cte1 as (
+    select fail_date as task_date, 'failed' as period_state
+    from failed
+    union
+    select success_date as task_date, 'succeeded' as period_state
+    from succeeded
+),
+cte2 as (
+    select task_date, 
+           period_state,
+           row_number() over(order by task_date) as row_order,
+           dense_rank() over(partition by period_state order by task_date) as rk
+    from cte1
+)
+select period_state,
+       min(task_date) as start_date,
+       max(task_date) as end_date
+from cte2
+where year(task_date) = 2019
+group by row_order - rk, period_state
+order by start_date
+
+- Solution 2.
+with cte1 as (
+    select fail_date as task_date, 'failed' as period_state from failed
+    union
+    select success_date as task_date, 'succeeded' as period_state from succeeded
+),
+cte2 as (
+    select *, 
+           row_number() over(partition by period_state order by task_date) as rn
+    from cte1
+    where year(task_date) = 2019
+)
+select period_state, 
+       min(task_date) as start_date,
+       max(task_date) as end_date
+from cte2
+group by date_sub(task_date, interval rn day), 1
+order by 2
