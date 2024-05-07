@@ -1,0 +1,11 @@
+1350. Students With Invalid Departments
+
+- Solution 1.
+select s.id, s.name
+from students s
+left join departments d on d.id = s.department_id
+where department_id not in (select id from departments)
+
+- Solution 2.
+select id, name from students
+where department_id not in (select id from departments)
