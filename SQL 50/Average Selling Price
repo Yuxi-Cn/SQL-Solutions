@@ -1,0 +1,15 @@
+1251. Average Selling Price
+
+- Solution 1.
+select p.product_id, ifnull(round(sum(p.price * u.units) / ifnull(sum(u.units), 0), 2), 0) as average_price
+from Prices as p
+left join UnitsSold as u on p.product_id = u.product_id
+and u.purchase_date >= p.start_date and u.purchase_date <= p.end_date 
+group by product_id
+
+- Solution 2.
+select p.product_id, coalesce(round(sum(p.price * u.units) / nullif(sum(u.units),0), 2),0) average_price
+from prices p
+left join unitssold u on p.product_id = u.product_id
+and u.purchase_date between p.start_date and p.end_date
+group by p.product_id
