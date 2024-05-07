@@ -1,0 +1,16 @@
+612. Shortest Distance in a Plane
+
+- Solution 1.
+with cte as (
+    select x, y, row_number() over(order by x, y) as rn
+    from point2d
+)
+select round(min(dist),2) as shortest from(
+    select p1.x, p1.y, sqrt(pow(p2.x-p1.x, 2)+pow(p2.y-p1.y, 2)) as dist
+    from cte p1
+    join cte p2 on p2.rn>p1.rn) a
+
+- Solution 2.
+select round(sqrt(min(pow(a.x-b.x, 2)+pow(a.y-b.y, 2))), 2) shortest
+from point2d a, point2d b
+where (a.x, a.y) <> (b.x, b.y)
