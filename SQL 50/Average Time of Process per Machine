@@ -1,0 +1,20 @@
+1661. Average Time of Process per Machine
+
+- Solution 1.
+select a.machine_id, 
+round(
+    avg(case when a.activity_type = 'end' then a.timestamp end) -
+    avg(case when a.activity_type = 'start' then a.timestamp end)
+    , 3) as processing_time
+from Activity a
+group by a.machine_id
+
+- Solution 2. (PostgreSQL)
+select a.machine_id, round(avg(process_time)::numeric, 3) as processing_time
+from (
+    select machine_id, sum(case 
+when activity_type = 'start' then -timestamp else timestamp end) as process_time
+from activity
+group by machine_id, process_id
+) a
+group by 1
