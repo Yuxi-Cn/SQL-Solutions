@@ -1,0 +1,33 @@
+1767. Find the Subtasks That Did Not Execute
+
+- Solution 1.
+with recursive cte_task as (
+    select 1 as n
+    union all
+    select n+1 
+    from cte_task
+    where n+1 <= (select max(subtasks_count) from tasks)
+),
+full_subtasks as (
+    select t.task_id, c.n as subtask_id
+    from tasks t
+    cross join cte_task c
+    where c.n <= t.subtasks_count
+)
+select fs.task_id, fs.subtask_id
+from full_subtasks fs
+left join executed e using(task_id, subtask_id)
+where e.task_id is null or e.subtask_id is null
+order by 1, 2
+
+- Solution 2.
+with recursive cte as (
+    select task_id, subtasks_count, 1 sub from tasks
+    union all
+    select task_id, subtasks_count, sub + 1 from cte
+    where sub < subtasks_count
+)
+select c.task_id, sub as subtask_id
+from cte c left join executed e 
+on c.task_id = e.task_id and c.sub = e.subtask_id
+where e.subtask_id is null
