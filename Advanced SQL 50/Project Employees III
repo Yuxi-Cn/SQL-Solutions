@@ -1,0 +1,10 @@
+1077. Project Employees III
+
+select project_id, employee_id
+from (select project_id, 
+       employee_id, 
+       dense_rank() over(partition by project_id order by experience_years desc) as report_rank
+from project 
+join employee 
+using(employee_id)) as report
+where report_rank = 1
