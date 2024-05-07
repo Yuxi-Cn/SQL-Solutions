@@ -1,0 +1,21 @@
+1173. Immediate Food Delivery I
+
+- Solution 1.
+with cte as (
+    select delivery_id,
+           customer_id,
+           case when order_date = customer_pref_delivery_date then 'immediate'
+           else 'scheduled' end as delivery_type
+           from delivery
+)
+select round(sum(case
+                     when delivery_type = 'immediate' then 1 else 0 end) 
+                     / count(*) * 100
+                     , 2) as immediate_percentage
+                from cte
+
+- Solution 2.
+select round(sum(case 
+       when order_date = customer_pref_delivery_date then 1
+       else 0 end) / count(*) * 100, 2) as immediate_percentage
+       from delivery
