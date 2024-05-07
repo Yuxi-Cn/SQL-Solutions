@@ -1,0 +1,10 @@
+1731. The Number of Employees Which Report to Each Employee
+
+select e.employee_id, e.name, count(*) as reports_count,
+round(avg(e2.age)) as average_age
+from Employees as e
+left join Employees as e2
+on e.employee_id = e2.reports_to 
+where e2.reports_to is not null
+group by e.employee_id
+order by e.employee_id
