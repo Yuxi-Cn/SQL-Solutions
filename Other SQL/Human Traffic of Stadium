@@ -1,0 +1,16 @@
+601. Human Traffic of Stadium
+
+with cte as (
+    select *,
+           id - row_number() over() as id_diff
+           from stadium
+           where people >= 100
+)
+select id, visit_date, people
+from cte 
+where id_diff in (
+    select id_diff 
+    from cte 
+    group by id_diff 
+    having count(*) >2
+    )
