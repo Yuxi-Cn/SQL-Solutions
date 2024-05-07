@@ -1,0 +1,8 @@
+1501. Countries You Can Safely Invest In
+
+select c1.name as country
+from person p
+join country c1 on left(p.phone_number, 3) = c1.country_code
+join calls c2 on p.id = c2.caller_id or p.id = c2.callee_id
+group by c1.name
+having avg(duration) > (select avg(duration) from calls)
