@@ -1,0 +1,17 @@
+613. Shortest Distance in a Line
+
+- Solution 1.
+select min(diff) as shortest
+from (
+    select p1.x as x1, 
+           p2.x as x2, 
+           abs(p2.x - p1.x) as diff
+    from point p1
+    join point p2 on p1.x <> p2.x
+    where p1.x < p2.x
+) as sub
+
+- Solution 2.
+select min(a.x - b.x) as shortest 
+from point a, point b
+where a.x > b.x
