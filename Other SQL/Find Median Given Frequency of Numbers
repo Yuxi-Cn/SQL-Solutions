@@ -1,0 +1,27 @@
+571. Find Median Given Frequency of Numbers
+
+- Solution 1.
+with recursive cte1 as(
+    select num, frequency, 1 as sequence from numbers
+    union all
+    select num, frequency, sequence + 1 from cte1 
+    where sequence < frequency
+)
+select round(avg(num), 1) as median 
+from (
+    select num, 
+           frequency, 
+           row_number() over(order by num) as rn,
+           count(*) over() as total_num
+    from cte1
+) as sub1
+where rn between total_num/2 and total_num/2+1
+
+- Solution 2.
+select avg(num) median
+from (
+    select *, 
+            sum(frequency) over(order by num) freq, 
+            (sum(frequency) over())/2 median_num
+    from numbers) as sub1
+where median_num between freq - frequency and freq
