@@ -1,0 +1,13 @@
+1264. Page Recommendations
+
+with cte as (
+    select distinct user2_id as id from friendship
+    where user1_id = 1
+    union all
+    select distinct user1_id as id from friendship
+    where user2_id = 1
+    )
+select distinct page_id as recommended_page 
+from likes
+where user_id in (select id from cte) 
+and page_id not in (select page_id from likes where user_id = 1)
