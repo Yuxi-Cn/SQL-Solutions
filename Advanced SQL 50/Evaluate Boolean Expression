@@ -1,0 +1,34 @@
+1440. Evaluate Boolean Expression
+
+- Solution 1.
+select e.*,
+       case
+           when operator = '>' then
+               case
+                   when v1.value > v2.value then 'true'
+                   else 'false'
+                end
+           when operator = '=' then
+               case
+                   when v1.value = v2.value then 'true'
+                   else 'false'
+                end
+           when operator = '<' then
+               case
+                   when v1.value < v2.value then 'true'
+                   else 'false'
+                end
+        end as value
+from Expressions e 
+join variables v1 on left_operand = v1.name
+join variables v2 on right_operand = v2.name
+
+- Solution 2.
+select left_operand, operator, right_operand, if(case
+    when operator = '<' then v1.value < v2.value
+    when operator = '>' then v1.value > v2.value
+    else v1.value = v2.value
+    end, 'true', 'false'
+    ) as value
+from expressions, variables as v1, variables as v2
+where left_operand = v1.name and right_operand = v2.name
