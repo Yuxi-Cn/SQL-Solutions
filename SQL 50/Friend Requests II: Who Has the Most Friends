@@ -1,0 +1,38 @@
+602. Friend Requests II: Who Has the Most Friends
+
+- Solution 1.
+with MostFriend as (
+    select number, count(*) as appearance
+    from (
+        select requester_id as number from RequestAccepted
+        union all
+        select accepter_id from RequestAccepted
+    ) as Combined_id
+    group by number
+)
+select number as id, appearance as num
+from MostFriend
+where appearance = (select max(appearance) from MostFriend)
+
+- Solution 2.
+with cte as (
+    select requester_id id from RequestAccepted 
+    union all
+    select accepter_id id from RequestAccepted
+    )
+select id, count(*) as num 
+from cte 
+group by 1 
+order by 2 desc 
+limit 1
+
+- Solution 3.
+select id, count(*) as num 
+from (
+    select requester_id id from RequestAccepted 
+    union all
+    select accepter_id id from RequestAccepted
+)as combined_id
+group by id
+order by num desc
+limit 1
