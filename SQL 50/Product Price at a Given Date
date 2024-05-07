@@ -1,0 +1,16 @@
+1164. Product Price at a Given Date
+
+with LatestPrice as (
+    select p.product_id, p.new_price,
+    row_number() over (partition by p.product_id order by p.change_date desc) as rn
+    from Products p
+    where p.change_date <= '2019-08-16'
+),
+RecentProduct as (
+    select distinct p2.product_id
+    from Products p2
+)
+select rp.product_id, ifnull(lp.new_price, 10) as price
+from RecentProduct as rp
+left join LatestPrice lp
+on rp.product_id = lp.product_id and lp.rn = 1
