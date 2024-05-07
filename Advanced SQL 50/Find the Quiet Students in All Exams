@@ -1,0 +1,37 @@
+1412. Find the Quiet Students in All Exams
+
+- Solution 1.
+with cte1 as (
+    select e.exam_id,
+           s.student_id, 
+           s.student_name,
+           e.score,
+           rank() over(partition by exam_id order by score desc) as rk1,
+           rank() over(partition by exam_id order by score asc) as rk2
+    from exam e
+    left join student s using(student_id)
+)
+select distinct student_id, student_name
+from cte1
+where student_id not in (select student_id from cte1 where rk1=1 or rk2=1)
+order by student_id
+
+- Solution 2.
+with cte1 as (
+    select exam_id,
+           s.student_id, 
+           student_name,
+           score,
+           max(score) over(partition by exam_id) as max_s,
+           min(score) over(partition by exam_id) as min_s
+    from exam 
+    left join student s using(student_id)
+)
+select distinct student_id, student_name
+from cte1
+where student_id not in (
+    select student_id
+    from cte1
+    where score = max_s or score = min_s
+)
+order by student_id
