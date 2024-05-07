@@ -1,0 +1,10 @@
+1495. Friendly Movies Streamed Last Month
+
+select title
+from content
+where kids_content = 'Y' 
+and content_type = 'Movies'
+and content_id in (
+    select content_id from tvprogram
+    where left(program_date, 7) = '2020-06'
+)
