@@ -1,0 +1,18 @@
+1050. Actors and Directors Who Cooperated At Least Three Times
+
+- Solution 1.
+select actor_id, director_id
+from (
+    select actor_id, 
+    director_id, 
+    row_number() over(partition by actor_id, director_id) as rn
+    from actordirector
+) as ad
+where rn >= 3
+group by actor_id, director_id
+
+- Solution 2.
+select actor_id, director_id
+from actordirector
+group by actor_id, director_id
+having count(timestamp) >= 3
