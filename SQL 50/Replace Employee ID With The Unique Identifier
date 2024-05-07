@@ -1,0 +1,5 @@
+1378. Replace Employee ID With The Unique Identifier
+
+select EmployeeUNI.unique_id, Employees.name 
+from EmployeeUNI
+right join Employees on EmployeeUNI.id = Employees.id
