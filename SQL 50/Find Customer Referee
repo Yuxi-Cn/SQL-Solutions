@@ -1,0 +1,4 @@
+584. Find Customer Referee
+
+select name from Customer
+where referee_id is null or not referee_id = '2'
