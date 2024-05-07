@@ -1,0 +1,8 @@
+1549. The Most Recent Orders for Each Product
+
+select p.product_name, p.product_id, o.order_id, o.order_date
+from products p
+join orders o using(product_id)
+where (o.product_id, o.order_date) in (select product_id, max(order_date) from orders group by product_id)
+group by product_name, product_id, order_id
+order by product_name asc, product_id asc, order_id asc
