@@ -1,0 +1,35 @@
+184. Department Highest Salary
+
+- Solution 1.
+select Department, Employee, Salary from (
+    select d.name as Department, 
+           e.name as Employee, 
+           e.salary as Salary,
+           dense_rank() over(partition by d.name order by e.salary desc) as salary_rank
+from Employee e
+join Department d on e.departmentId = d.id
+group by d.name, e.name
+) as RankList
+where salary_rank = 1
+
+- Solution 2.
+select d.name as Department, e.name as Employee, e.salary as Salary
+from Employee e
+join Department d on e.departmentId = d.id
+where (e.departmentId, e.salary) in (
+    select departmentId, max(salary)
+    from Employee
+    group by departmentId
+    )
+
+- Solution 3.
+with cte1 as (
+    select d.name as Department, 
+           e.name as Employee, 
+           e.salary as Salary,
+           dense_rank() over(partition by e.departmentId order by salary desc) as dpt_rank
+    from employee e join department d on e.departmentId = d.id
+) 
+select Department, Employee, Salary
+from cte1
+where dpt_rank = 1
