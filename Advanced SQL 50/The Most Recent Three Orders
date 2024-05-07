@@ -1,0 +1,20 @@
+1532. The Most Recent Three Orders
+
+select c.name as customer_name, 
+       o.customer_id,
+       o.order_id,
+       o.order_date
+from customers c
+join orders o using(customer_id)
+join (
+    select customer_id, order_date
+    from (
+        select customer_id, 
+               order_date, 
+               row_number() over(partition by customer_id order by order_date desc) as rn
+        from orders
+    ) as sub1
+    where rn < 4
+) as sub2
+on o.customer_id = sub2.customer_id and o.order_date = sub2.order_date
+order by 1, 2, 4 desc
