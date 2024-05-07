@@ -1,0 +1,24 @@
+1511. Customer Order Frequency
+
+- Solution 1.
+select customer_id, name
+from customers c
+join orders using(customer_id)
+join product using(product_id)
+group by c.customer_id 
+having sum(if(left(order_date, 7) = '2020-06', quantity, 0) * price) > 99
+and sum(if(left(order_date, 7) = '2020-07', quantity, 0) * price) > 99
+
+- Solution 2. (PostgreSQL)
+select customer_id, name
+from customers c
+join orders using(customer_id) 
+join product using(product_id)
+group by c.customer_id, c.name
+having sum(case when extract(year from order_date) = 2020 
+       and extract(month from order_date) = 06
+       then quantity * price else 0 end) > 99
+       and
+       sum(case when extract(year from order_date) = 2020 
+       and extract(month from order_date) = 07
+       then quantity * price else 0 end) > 99
