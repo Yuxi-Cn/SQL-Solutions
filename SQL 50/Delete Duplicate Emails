@@ -1,0 +1,5 @@
+196. Delete Duplicate Emails
+
+delete x from Person x, person y 
+where x.id>y.id and 
+x.email = y.email
