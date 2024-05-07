@@ -1,0 +1,10 @@
+1280. Students and Examinations
+
+select s.student_id, s.student_name, s1.subject_name,
+count(e.subject_name) as attended_exams
+from Students s
+cross join Subjects s1
+left join Examinations 
+using(student_id, subject_name)
+group by 1, 2, 3
+order by 1, 3
