@@ -1,0 +1,8 @@
+1699. Number of Calls Between Two Persons
+
+select least(from_id, to_id) as person1,
+       greatest(from_id, to_id) as person2,
+       count(duration) as call_count,
+       sum(duration) as total_duration
+from calls
+group by person1, person2
