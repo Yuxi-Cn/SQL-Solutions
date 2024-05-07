@@ -1,0 +1,6 @@
+1303. Find the Team Size
+
+select e.employee_id, (select count(employee_id) 
+from employee 
+where e.team_id = team_id) as team_size
+from employee e
