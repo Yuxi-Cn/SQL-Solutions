@@ -1,7 +1,6 @@
 614. Second Degree Follower
 
-select t1.follower, count(distinct t2.follower) as num 
-from follow t1
-join follow t2
-on t1.follower = t2.followee
+select t1.follower, count(distinct t2.follower) as num
+from follow t1, follow t2
+where t1.follower = t2.followee
 group by 1
