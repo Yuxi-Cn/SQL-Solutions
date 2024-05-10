@@ -1,0 +1,44 @@
+618. Students Report By Geography
+
+- Solution 1.
+
+select 
+max(case when continent = 'America' then name end) as 'America',
+max(case when continent = 'Asia' then name end) as 'Asia',
+max(case when continent = 'Europe' then name end) as 'Europe'
+from (
+    select *, 
+    row_number() over(partition by continent order by name) as rn
+    from student) a
+group by rn
+
+- Solution 2. (MS SQL Server / T-SQL)
+
+select  America, Asia, Europe
+from (select *, 
+             row_number() over(partition by continent order by name) as rn 
+      from student
+      ) as student_2
+pivot
+(max(name) 
+for continent in 
+([America], [Asia], [Europe])
+) as pivot_table
+
+
+- Solution of the Follow-up question
+
+with cte as (select 
+max(case when continent = 'America' then name end) as 'America',
+max(case when continent = 'Asia' then name end) as 'Asia',
+max(case when continent = 'Europe' then name end) as 'Europe'
+from (
+    select *, 
+    row_number() over(partition by continent order by name) as rn
+    from student) a
+group by rn)
+
+select distinct count(America) over() as America_num,
+       count(Asia) over() as Asia_num,
+       count(Europe) over() as Europe_num
+from cte
