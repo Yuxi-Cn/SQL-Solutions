@@ -1,6 +1,7 @@
 1076. Project Employees II
 
 - Solution 1.
+
 select project_id
 from (select project_id, 
 rank() over(order by count(employee_id) desc) as rk
@@ -9,6 +10,7 @@ group by 1) a
 where rk = 1
 
 - Solution 2.
+
 select project_id
 from project
 group by 1
@@ -18,6 +20,7 @@ having count(employee_id)
     )
 
 - Solution 3.
+
 select project_id
 from project
 group by 1
