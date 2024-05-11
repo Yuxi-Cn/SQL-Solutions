@@ -1,0 +1,30 @@
+1076. Project Employees II
+
+- Solution 1.
+select project_id
+from (select project_id, 
+rank() over(order by count(employee_id) desc) as rk
+from project
+group by 1) a
+where rk = 1
+
+- Solution 2.
+select project_id
+from project
+group by 1
+having count(employee_id) 
+>= all(
+    select count(employee_id) from project group by project_id
+    )
+
+- Solution 3.
+select project_id
+from project
+group by 1
+having count(employee_id) = (
+    select count(employee_id)
+    from project
+    group by project_id
+    order by 1 desc
+    limit 1
+)
