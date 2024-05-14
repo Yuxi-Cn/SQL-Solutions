@@ -1,10 +1,25 @@
 1107. New Users Daily Count
 
+- Solution 1.
+
 select login_date, count(distinct user_id) as user_count
 from (
     select user_id, min(activity_date) as login_date
     from traffic
     where activity = 'login'
     group by 1
-    having datediff("2019-06-30", min(activity_date)) <= 90) a
+    having datediff("2019-06-30", min(activity_date)) <= 90
+    ) a
 group by 1
+
+- Solution 2.
+
+with cte as (
+    select user_id, min(activity_date) as first_date
+    from traffic
+    where activity = 'login'
+    group by 1
+)
+select first_date as login_date, count(user_id) as user_count from cte
+group by 1
+having date_add(first_date, interval 90 day) >= '2019-06-30'
