@@ -1,0 +1,31 @@
+1097. Game Play Analysis V
+
+- Solution 1.
+
+with cte as (
+    select player_id, 
+    min(event_date) as install_dt
+    from activity
+    group by 1
+)
+select install_dt, count(distinct a.player_id) as installs,
+round(sum(
+    case when datediff(event_date, install_dt)=1 then 1 else 0 end
+    ) / count(distinct a.player_id), 2) as Day1_retention
+    from activity a 
+    join cte c on a.player_id = c.player_id
+    group by 1
+
+- Solution 2.
+
+select install_dt, 
+       count(a.player_id) installs,
+       round(count(b.player_id) / count(a.player_id), 2) Day1_retention
+from (
+    select player_id, min(event_date) install_dt
+    from activity
+    group by 1
+) a
+left join activity b on a.player_id = b.player_id
+and a.install_dt + 1 = b.event_date
+group by 1
