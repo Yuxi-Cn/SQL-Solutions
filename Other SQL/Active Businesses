@@ -1,0 +1,29 @@
+1126. Active Businesses
+
+- Solution 1.
+
+select business_id 
+from (
+    select event_type, avg(occurrences) as avg_occ
+from events
+group by event_type
+) average
+join events e on e.event_type = average.event_type
+where e.occurrences > average.avg_occ
+group by business_id
+having count(e.event_type) > 1
+
+- Solution 2.
+
+with cte1 as (
+    select *, avg(occurrences) over(partition by event_type) as avg_occ 
+    from events
+),
+     cte2 as (
+    select *, case when occurrences > avg_occ then 1 else 0 end as active_number
+    from cte1
+     )
+select business_id 
+from cte2 
+group by 1
+having sum(active_number) > 1
