@@ -1,5 +1,7 @@
 1132. Reported Posts II
 
+- Solution 1.
+
 select round(sum(percentage)/count(distinct action_date), 2) as average_daily_percent
 from
 (select a.action_date,
@@ -9,3 +11,29 @@ left join removals r using(post_id)
 where extra = 'spam'
 group by 1
 ) sub1
+
+- Solution 2.
+
+with cte as (
+    select a.post_id, action_date, 
+           count(distinct r.post_id) / count(distinct a.post_id) * 100 average
+    from actions a
+    left join removals r using(post_id)
+    where extra = 'spam'
+    group by 2
+)
+select round(avg(average),2) average_daily_percent from cte
+
+- Solution 3.
+
+with cte as (
+    select action_date, 
+       count(distinct case when remove_date is not null then post_id else null end)
+       /count(distinct post_id) as average
+from (
+    select a.post_id, a.action_date, r.remove_date
+    from actions a 
+    left join removals r using(post_id)
+    where extra = 'spam') sub
+    group by 1)
+select round(avg(average)*100,2) average_daily_percent from cte
