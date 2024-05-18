@@ -1,0 +1,20 @@
+1082. Sales Analysis I
+
+- Solution 1.
+
+select seller_id
+from (
+    select seller_id, rank() over(order by sum(price) desc) rk
+    from sales
+    group by 1
+) temp1
+where rk = 1
+
+- Solution 2.
+
+select seller_id
+from sales
+group by 1
+having sum(price) >= all(
+    select sum(price) from sales group by seller_id
+)
