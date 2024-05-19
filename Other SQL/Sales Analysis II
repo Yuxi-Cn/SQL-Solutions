@@ -1,0 +1,15 @@
+1083. Sales Analysis II
+
+with cte as (
+    select s.product_id, p.product_name, s.buyer_id
+    from sales s left join product p using(product_id)
+)
+
+select distinct buyer_id
+from cte 
+where product_name = 'S8'
+and buyer_id not in (
+    select buyer_id
+    from cte
+    where product_name = 'iPhone'
+)
