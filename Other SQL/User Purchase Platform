@@ -1,0 +1,32 @@
+1127. User Purchase Platform
+
+select 
+       sub3.spend_date,
+       sub3.platform,
+       ifnull(sum(amount), 0) total_amount,
+       count(user_id) total_users
+from (
+    select distinct spend_date, 'desktop' platform from spending
+    union
+    select distinct spend_date, 'mobile' platform from spending
+    union
+    select distinct spend_date, 'both' platform from spending
+) sub3
+left join(
+    select 
+           spend_date, 
+           user_id, 
+           if(mobile_amount > 0, if(desktop_amount>0, 'both', 'mobile'), 'desktop') platform,
+           (mobile_amount+desktop_amount) amount
+    from (
+        select 
+            spend_date, 
+            user_id, 
+            sum(case platform when 'mobile' then amount else 0 end) as mobile_amount,
+            sum(case platform when 'desktop' then amount else 0 end) as desktop_amount
+        from spending
+        group by 1, 2
+    )sub1
+) sub2
+using(spend_date, platform)
+group by 1, 2
