@@ -1,0 +1,23 @@
+1149. Article Views II
+
+- Solution 1.
+
+select distinct viewer_id as id
+from views
+group by view_date, viewer_id
+having count(distinct article_id) > 1
+order by 1
+
+- Solution 2.
+
+with cte as (
+    select viewer_id as id, 
+    row_number() over(partition by view_date, viewer_id) as rn
+    from (
+        select distinct viewer_id, article_id, view_date
+        from views
+    )a
+)
+select distinct id from cte
+where rn > 1
+order by 1
