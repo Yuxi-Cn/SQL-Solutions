@@ -1,0 +1,14 @@
+1355. Activity Participants
+
+with cte as (
+    select activity, count(id) as num
+    from friends
+    group by activity
+)
+select activity
+from cte
+where num not in (
+    select max(num) from cte
+    union
+    select min(num) from cte
+    )
