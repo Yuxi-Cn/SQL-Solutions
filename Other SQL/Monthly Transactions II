@@ -1,0 +1,27 @@
+1205. Monthly Transactions II
+
+select  
+       month, 
+       country, 
+       sum(state = 'approved') as approved_count,
+       sum(case when state = 'approved' then amount else 0 end) as approved_amount,
+       sum(state = 'chargeback') as chargeback_count,
+       sum(case when state = 'chargeback' then amount else 0 end) as chargeback_amount
+from (
+    select 
+       left(trans_date, 7) as month,
+       country, 
+       state, 
+       amount
+    from transactions
+    where state = 'approved'
+union all
+    select
+       left(c.trans_date, 7) as month,
+       country,
+       'chargeback' as state,
+       amount
+    from chargebacks c
+    left join transactions t on c.trans_id = t.id
+) as temp1
+group by 1, 2
