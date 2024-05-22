@@ -1,0 +1,10 @@
+1241. Number of Comments per Post
+
+select 
+      a.sub_id post_id, 
+      count(distinct b.sub_id) number_of_comments
+from submissions a
+left join submissions b
+on a.sub_id = b.parent_id 
+where a.parent_id is null
+group by 1
