@@ -1,0 +1,20 @@
+615. Average Salary: Departments VS Company
+
+select 
+       pay_month, 
+       department_id,
+       (case 
+            when avg_department = avg_month then 'same'
+            when avg_department > avg_month then 'higher'
+            when avg_department < avg_month then 'lower'
+        end) as comparison
+from 
+(select
+    left(pay_date, 7) as pay_month,
+    e.department_id, 
+    avg(amount) over(partition by department_id, left(pay_date, 7)) as avg_department,
+    avg(amount) over(partition by left(pay_date, 7)) as avg_month
+    from salary s
+    join employee e using(employee_id)
+) temp1
+group by 1, 2
