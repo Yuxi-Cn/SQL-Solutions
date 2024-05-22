@@ -1,0 +1,26 @@
+1194. Tournament Winners
+
+with cte as (
+    select 
+          first_player as player_id,
+          first_score as score
+    from matches
+        union all
+    select 
+          second_player as player_id,
+          second_score as score
+    from matches
+)
+select 
+       group_id, 
+       player_id
+from (
+    select c.player_id, 
+           score, 
+           p.group_id,
+           rank() over(partition by group_id order by sum(score) desc, player_id) as rk
+    from cte c
+    left join players p using(player_id)
+    group by 1
+) temp1
+where rk = 1
