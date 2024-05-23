@@ -1,0 +1,22 @@
+1308. Running Total for Different Genders
+
+- Solution 1.
+
+select 
+    gender, 
+    day, 
+    sum(score_points) over(partition by gender order by day
+                      ) as total
+from scores
+order by 1, 2
+
+- Solution 2.
+
+select a.gender, 
+       a.day, 
+       sum(b.score_points) as total
+from scores a, scores b
+where a.gender = b.gender 
+and a.day >= b.day
+group by 1, 2
+order by 1, 2
