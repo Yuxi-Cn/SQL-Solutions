@@ -1,0 +1,13 @@
+1364. Number of Trusted Contacts of a Customer
+
+select invoice_id, 
+       cu.customer_name,
+       price, 
+       count(co.contact_name) as contacts_cnt,
+       count(cu2.email) as trusted_contacts_cnt
+from invoices i
+join customers cu on i.user_id = cu.customer_id
+left join contacts co on cu.customer_id = co.user_id
+left join customers cu2 on co.contact_email = cu2.email
+group by 1, 2
+order by 1
