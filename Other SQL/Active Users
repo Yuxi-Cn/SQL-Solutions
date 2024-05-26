@@ -1,0 +1,28 @@
+1454. Active Users
+
+with cte1 as (
+    select id, 
+           login_date,
+           row_number() over(partition by id order by login_date) as rn
+    from (
+        select distinct id, login_date from Logins) temp1
+),
+cte2 as (
+    select id, 
+           login_date,
+           rn,
+           date_sub(login_date, interval rn day) as grp
+    from cte1
+),
+cte3 as (
+    select id, 
+           grp,
+           count(*) as consecutive
+    from cte2
+    group by id, grp
+    having consecutive >= 5
+)
+select distinct id, name
+from cte3
+join accounts using(id)
+order by id
