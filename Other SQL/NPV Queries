@@ -1,0 +1,9 @@
+1421. NPV Queries
+
+select 
+      q.id, 
+      q.year, 
+      ifnull(n.npv, 0) as npv
+from Queries q
+left join NPV n
+using(id, year)
