@@ -1,0 +1,28 @@
+1336. Number of Transactions per Visit
+
+with cte1 as (
+        select 
+           v.user_id, 
+           v.visit_date,
+           ifnull(count(amount), 0) as transaction_cnt
+        from visits v
+        left join transactions t
+        on v.user_id = t.user_id
+        and v.visit_date = t.transaction_date
+        group by 1, 2
+    ),
+cte2 as (
+    select 0 as rn
+    union all
+    select row_number() over() as rn
+    from transactions
+)
+select 
+      rn as transactions_count, 
+      count(transaction_cnt) as visits_count
+      from cte1 c1
+      right join cte2 c2
+      on c1.transaction_cnt = c2.rn
+      where c2.rn <= (select max(transaction_cnt) from cte1)
+      group by 1
+      order by 1
