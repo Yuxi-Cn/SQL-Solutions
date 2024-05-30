@@ -1,0 +1,26 @@
+1555. Bank Account Summary
+
+select 
+      user_id, 
+      user_name, 
+      credit + ifnull(credit_update, 0) as credit,
+      case 
+          when credit + ifnull(credit_update, 0) >=0 
+          then 'No' else 'Yes' 
+          end as credit_limit_breached
+from(
+    select 
+        u.user_id, 
+        u.user_name,
+        u.credit,
+        sum(
+            case 
+            when t.paid_by = u.user_id then -t.amount
+            when t.paid_to = u.user_id then t.amount
+            end
+            ) as credit_update
+from users u 
+left join transactions t 
+on u.user_id = t.paid_by or u.user_id = t.paid_to
+group by 1
+) temp1
