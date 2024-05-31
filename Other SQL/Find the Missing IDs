@@ -1,0 +1,26 @@
+1613. Find the Missing IDs
+
+- Solution 1.
+
+with recursive id_number as (
+    select 1 as n
+    union all
+    select n + 1 from id_number where n < 100
+)
+select i.n as ids
+from id_number i
+left join Customers c on c.customer_id = i.n
+where n <= (select max(customer_id) from Customers)
+and c.customer_id is null
+
+- Solution 2.
+
+with recursive id_number as (
+    select 1 as n
+    union all
+    select n + 1 from id_number 
+    where n < (select max(customer_id) from Customers)
+)
+select n as ids
+from id_number 
+where n not in (select customer_id from Customers)
