@@ -1,0 +1,21 @@
+1384. Total Sales Amount by Year
+
+with recursive day_num as (
+    select min(period_start) as date from sales
+    union all
+    select date_add(date, interval 1 day) from day_num
+    where date <= (select max(period_end) from sales)
+)
+select 
+      s.product_id, 
+      p.product_name,
+      left(date, 4) as report_year,
+      sum(average_daily_sales) as total_amount
+from sales s
+join product p 
+    using(product_id)
+join day_num d 
+    on d.date >= s.period_start
+    and d.date <= s.period_end
+group by 1, 2, 3
+order by 1, 3
