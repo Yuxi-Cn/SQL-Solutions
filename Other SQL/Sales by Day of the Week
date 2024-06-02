@@ -1,0 +1,48 @@
+1479. Sales by Day of the Week
+
+- Solution 1.
+
+select
+       cg as Category, 
+       coalesce(sum(case when weekday = 'Monday' then qt else 0 end), 0) as Monday,
+       coalesce(sum(case when weekday = 'Tuesday' then qt else 0 end), 0) as Tuesday,
+       coalesce(sum(case when weekday = 'Wednesday' then qt else 0 end), 0) as Wednesday,
+       coalesce(sum(case when weekday = 'Thursday' then qt else 0 end), 0) as Thursday,
+       coalesce(sum(case when weekday = 'Friday' then qt else 0 end), 0) as Friday,
+       coalesce(sum(case when weekday = 'Saturday' then qt else 0 end), 0) as Saturday,
+       coalesce(sum(case when weekday = 'Sunday' then qt else 0 end), 0) as Sunday
+from(
+    select 
+           cg, 
+           sum(quantity) as qt, 
+           weekday 
+    from(
+        select 
+               o.item_id, 
+               o.quantity, 
+               i.item_category as cg, 
+               dayname(o.order_date) as weekday
+        from Orders o 
+        right join Items i 
+        using(item_id)
+        ) temp1
+    group by cg, weekday
+    ) temp2
+group by cg
+order by cg
+
+- Solution 2.
+
+select 
+       i.item_category as Category,
+       sum(if(dayofweek(o.order_date) = 2, quantity, 0)) Monday,
+       sum(if(dayofweek(o.order_date) = 3, quantity, 0)) Tuesday,
+       sum(if(dayofweek(o.order_date) = 4, quantity, 0)) Wednesday,
+       sum(if(dayofweek(o.order_date) = 5, quantity, 0)) Thursday,
+       sum(if(dayofweek(o.order_date) = 6, quantity, 0)) Friday,
+       sum(if(dayofweek(o.order_date) = 7, quantity, 0)) Saturday,
+       sum(if(dayofweek(o.order_date) = 1, quantity, 0)) Sunday
+from Items i
+left join Orders o on o.item_id = i.item_id
+group by Category
+order by Category
