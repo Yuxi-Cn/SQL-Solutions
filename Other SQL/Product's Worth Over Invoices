@@ -1,0 +1,13 @@
+1677. Product's Worth Over Invoices
+
+select
+      p.name,
+      ifnull(sum(i.rest),0) as rest,
+      ifnull(sum(i.paid), 0) as paid,
+      ifnull(sum(i.canceled), 0) as canceled,
+      ifnull(sum(i.refunded), 0) as refunded
+from Invoice i
+right join Product p
+using(product_id)
+group by p.name
+order by p.name
