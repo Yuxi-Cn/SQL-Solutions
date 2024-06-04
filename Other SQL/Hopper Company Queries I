@@ -1,0 +1,36 @@
+1635. Hopper Company Queries I
+
+with recursive month_num as (
+    select 1 as month
+    union all
+    select month + 1 as month from month_num
+    where month < 12
+)
+
+select 
+      month, 
+      active_drivers, 
+      accepted_rides
+from (
+    select 
+          m.month, 
+          count(d.driver_id) as active_drivers
+    from month_num m
+    left join Drivers d
+        on d.join_date <= last_day(date_format(concat('2020-',lpad(m.month, 2, '0'),'-01'), '%Y-%m-%d'))
+    group by m.month
+    ) temp1
+
+left join (
+    select 
+          m.month, 
+          count(a.ride_id) as accepted_rides
+    from month_num m
+    left join Rides r 
+        on m.month = month(requested_at) and year(r.requested_at) = 2020
+    left join AcceptedRides a 
+        on r.ride_id = a.ride_id
+    group by month   
+        ) temp2
+using(month)
+order by month
