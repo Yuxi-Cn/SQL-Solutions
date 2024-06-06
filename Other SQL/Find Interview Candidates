@@ -1,0 +1,37 @@
+1811. Find Interview Candidates
+
+with any_medal as (
+    select contest_id, gold_medal as user_id from contests
+    union all
+    select contest_id, silver_medal as user_id from contests
+    union all
+    select contest_id, bronze_medal as user_id from contests
+),
+medal_rank as (
+    select 
+          user_id, 
+          contest_id, 
+          row_number() over(partition by user_id order by contest_id) as rn
+    from any_medal
+),
+consecutive_medal as (
+    select 
+          user_id
+    from medal_rank
+    group by user_id, contest_id - rn 
+    having count(*) >= 3
+
+    union all
+
+    select 
+          gold_medal as user_id
+    from contests
+    group by gold_medal
+    having count(*) >= 3
+)
+select 
+      distinct name, 
+      mail 
+from consecutive_medal
+join Users
+using(user_id)
