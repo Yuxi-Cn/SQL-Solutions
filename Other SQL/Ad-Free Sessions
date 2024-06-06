@@ -1,0 +1,38 @@
+1809. Ad-Free Sessions
+
+- Solution 1.
+
+select distinct session_id
+from (
+    select
+          p.session_id,
+          a.customer_id,
+          a.timestamp
+    from Ads a
+    right join Playback p
+    on p.customer_id = a.customer_id 
+    and a.timestamp between p.start_time and p.end_time
+) temp1
+where customer_id is null
+
+- Solution 2.
+
+select session_id
+from Playback
+where session_id not in 
+(
+    select session_id
+    from Playback p
+    join Ads a
+    on p.customer_id = a.customer_id
+    and a.timestamp between p.start_time and p.end_time
+)
+
+- Solution 3.
+
+select session_id
+from Playback p
+left join Ads a
+on p.customer_id = a.customer_id
+and a.timestamp between p.start_time and p.end_time
+where a.customer_id is null
