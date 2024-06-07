@@ -1,0 +1,46 @@
+1841. League Statistics
+
+with goal as (
+    select 
+          home_team_id, 
+          away_team_id,
+          home_team_goals,
+          away_team_goals,
+          
+              case when home_team_goals > away_team_goals then 3 
+                   when home_team_goals = away_team_goals then 1
+                   else 0 
+              end as home_points,
+
+              case when away_team_goals > home_team_goals then 3 
+                   when away_team_goals = home_team_goals then 1
+                   else 0 
+              end as away_points
+    from Matches
+)
+
+select 
+      t.team_name, 
+      count(g.id) as matches_played,
+      sum(g.goals) as points,
+      sum(g.goal_for) as goal_for,
+      sum(g.goal_against) as goal_against,
+      sum(g.goal_for) - sum(g.goal_against) as goal_diff
+from (
+    select 
+          home_team_id as id, 
+          home_points as goals, 
+          home_team_goals as goal_for, 
+          away_team_goals as goal_against 
+    from goal
+    union all
+    select 
+          away_team_id as id, 
+          away_points as goals, 
+          away_team_goals as goal_for, 
+          home_team_goals as goal_against 
+    from goal
+) g
+join Teams t on t.team_id = g.id
+group by g.id, t.team_name
+order by points desc, goal_diff desc, t.team_name
