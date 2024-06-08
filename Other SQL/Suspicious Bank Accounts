@@ -1,0 +1,20 @@
+1843. Suspicious Bank Accounts
+
+with month_tran as (
+    select 
+          t.account_id, 
+          sum(amount) as income,
+           a.max_income,
+           date_format(day, "%Y%m") as month
+    from Transactions t
+    join Accounts a using(account_id)
+    where type = "Creditor"
+    group by account_id, month
+)
+
+select distinct m1.account_id
+from month_tran m1, month_tran m2
+where m1.account_id = m2.account_id
+  and m1.month - 1 = m2.month
+  and m1.income > m1.max_income 
+  and m2.income > m2.max_income
