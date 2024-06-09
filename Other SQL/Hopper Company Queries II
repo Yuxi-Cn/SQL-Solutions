@@ -1,0 +1,60 @@
+1645. Hopper Company Queries II
+
+with recursive month as (
+    select 1 as month
+    union all
+    select month + 1 as month
+    from month
+    where month < 12
+),
+initial_driver as (
+    select 
+          count(driver_id) as initial_count
+    from Drivers
+    where join_date < "2020-01-01"
+),
+active_driver as (
+    select 
+          month(join_date) as month, 
+          count(driver_id) as active_driver
+    from Drivers
+    where join_date between "2020-01-01" and "2020-12-31"
+    group by month
+),
+cumulative_active_driver as (
+    select m.month, 
+    (
+        select 
+              count(driver_id) 
+        from Drivers 
+        where join_date < "2020-01-01"
+    ) + 
+    coalesce(
+        sum(ad.active_driver) over(order by m.month)
+        , 0) as a_driver
+    from month m
+    left join active_driver ad 
+    using(month)
+),
+accepted_driver as (
+    select 
+          count(distinct a.driver_id) as accepted_driver, 
+          month(r.requested_at) as month
+    from Rides r 
+    join AcceptedRides a 
+    using(ride_id)
+    where requested_at between "2020-01-01" and "2020-12-31"
+    group by month
+)
+
+select 
+      cad.month, 
+      round(
+        ifnull(
+            ad.accepted_driver / cad.a_driver
+            , 0) * 100
+        , 2) as working_percentage
+from cumulative_active_driver cad 
+left join accepted_driver ad 
+using(month)
+order by cad.month
