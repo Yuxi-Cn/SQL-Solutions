@@ -1,0 +1,28 @@
+1867. Orders With Maximum Quantity Above Average
+
+with avg_quantity as (
+    select 
+          order_id, 
+          product_id,
+          max(quantity) over(partition by order_id) as max_quantity, 
+          avg(quantity) over(partition by order_id) as avg_quantity
+    from ordersdetails
+),
+max_avg as (
+    select 
+          max(avg_quantity) as max_avg
+    from avg_quantity
+)
+
+select 
+      distinct order_id 
+from (
+    select 
+          a.order_id, 
+          a.max_quantity, 
+          m.max_avg
+    from avg_quantity a
+    cross join max_avg m
+    where max_quantity > max_avg
+    group by 1
+    ) temp1
