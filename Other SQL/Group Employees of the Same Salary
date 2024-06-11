@@ -1,0 +1,25 @@
+1875. Group Employees of the Same Salary
+
+with duplicate as (
+    select 
+          * 
+    from employees
+    group by salary
+    having count(*)>1
+),
+fulltable as (
+    select 
+          e.employee_id, 
+          e.name, 
+          e.salary
+    from employees e
+    join duplicate using(salary)
+)
+
+select 
+      employee_id, 
+      name, 
+      salary, 
+      dense_rank() over(order by salary asc) as team_id
+from fulltable
+order by team_id asc, employee_id asc
