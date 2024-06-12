@@ -1,0 +1,7 @@
+1939. Users That Actively Request Confirmation Messages
+
+select distinct a.user_id
+from Confirmations a, Confirmations b
+where a.user_id = b.user_id
+and a.time_stamp < b.time_stamp
+and a.time_stamp >= b.time_stamp - interval 24 hour
