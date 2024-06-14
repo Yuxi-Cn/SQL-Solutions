@@ -1,0 +1,20 @@
+1949. Strong Friendship
+
+with user_friend as (
+    select user1_id 'user', user2_id 'friend' from Friendship
+    union all
+    select user2_id 'user', user1_id 'friend' from Friendship
+)
+
+select 
+      f.user1_id, 
+      f.user2_id, 
+      count(*) as common_friend
+from Friendship f, 
+     user_friend uf1, 
+     user_friend uf2
+where f.user1_id = uf1.user
+  and f.user2_id = uf2.user
+  and uf1.friend = uf2.friend
+group by f.user1_id, f.user2_id
+having count(*) >= 3
