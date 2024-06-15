@@ -1,0 +1,42 @@
+1951. All the Pairs With the Maximum Number of Common Followers
+
+- Solution 1.
+
+with cf as (
+    select 
+          a.user_id as user1, 
+          b.user_id as user2, 
+          count(*) as common_follower
+    from Relations a, 
+         Relations b
+    where a.user_id < b.user_id 
+      and a.follower_id = b.follower_id
+    group by user1, user2
+)
+
+select 
+      user1 as user1_id, 
+      user2 as user2_id
+from cf
+where common_follower in (
+    select max(common_follower) 
+    from cf
+    )
+
+- Solution 2.
+
+select 
+      user1_id, 
+      user2_id
+from (
+    select 
+          a.user_id as user1_id, 
+          b.user_id as user2_id, 
+          rank() over(order by count(*) desc) as rk
+    from relations a, 
+         relations b
+    where a.user_id < b.user_id 
+      and a.follower_id = b.follower_id
+    group by user1_id, user2_id
+    ) temp1
+where rk = 1
