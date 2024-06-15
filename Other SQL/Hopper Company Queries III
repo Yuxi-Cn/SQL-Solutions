@@ -1,0 +1,40 @@
+1651. Hopper Company Queries III
+
+with recursive month as (
+    select 1 as month
+    union all
+    select month + 1 as month from month
+    where month <12
+),
+month_ride as (
+    select 
+          month(r.requested_at) as month, 
+          sum(a.ride_distance) as ride_distance, 
+          sum(a.ride_duration) as ride_duration
+    from AcceptedRides a
+    join Rides r using(ride_id)
+    where year(r.requested_at) = 2020
+    group by month(r.requested_at)
+),
+final_ride as (
+    select 
+          m.month, 
+          ifnull(mr.ride_distance, 0) as ride_distance, 
+          ifnull(mr.ride_duration, 0) as ride_duration
+    from month m 
+    left join month_ride mr on mr.month = m.month
+)
+
+select 
+      f1.month as month, 
+      round(
+        (f1.ride_distance + f2.ride_distance + f3.ride_distance) / 3
+        , 2) as average_ride_distance,
+      round(
+        (f1.ride_duration + f2.ride_duration + f3.ride_duration) / 3
+        , 2) as average_ride_duration
+from final_ride f1, 
+     final_ride f2, 
+     final_ride f3
+where f1.month = f2.month - 1 
+  and f2.month = f3.month - 1
