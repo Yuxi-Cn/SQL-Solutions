@@ -1,0 +1,9 @@
+1988. Find Cutoff Score for Each School
+
+select 
+      s.school_id, 
+      ifnull(min(e.score), -1) as score
+from schools s
+left join exam e 
+       on s.capacity >= e.student_count
+group by school_id
