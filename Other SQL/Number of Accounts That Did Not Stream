@@ -1,0 +1,9 @@
+2020. Number of Accounts That Did Not Stream
+
+select 
+      count(distinct s1.account_id) as accounts_count
+from subscriptions s1
+left join streams s2 
+    using (account_id)
+where s1.end_date between '2021-01-01' and '2021-12-31'
+  and year(s2.stream_date) != 2021
