@@ -1,0 +1,35 @@
+1972. First and Last Call On the Same Day
+
+- Solution 1.
+
+with all_calls as (
+    select caller_id, recipient_id, call_time from calls
+    union all
+    select recipient_id as caller_id, caller_id as recipient_id, call_time from calls
+),
+rn_calls as (
+    select 
+          caller_id, 
+          recipient_id, 
+          call_time,
+          row_number() over(partition by caller_id, date(call_time) order by call_time) as first_call,
+          row_number() over(partition by caller_id, date(call_time) order by call_time desc) as last_call
+    from all_calls
+)
+
+select 
+      distinct caller_id as user_id 
+from rn_calls
+where first_call = 1 or last_call = 1
+group by caller_id, date(call_time)
+having count(distinct recipient_id) = 1
+
+- Solution 2. (for the final step)
+
+select 
+      distinct a.caller_id as user_id
+from rn_calls a, rn_calls b
+where a.caller_id = b.caller_id 
+  and a.recipient_id = b.recipient_id 
+  and a.first_call = 1 
+  and b.last_call = 1
