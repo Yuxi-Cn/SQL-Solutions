@@ -1,0 +1,45 @@
+1892. Page Recommendations II
+
+- Solution 1.
+
+with friends as (
+    select user1_id as user, user2_id as friend from Friendship
+    union all
+    select user2_id as user, user1_id as friend from Friendship
+)
+
+select 
+      f.user as user_id, 
+      l1.page_id, 
+      count(distinct f.friend) as friends_likes
+from friends f
+join Likes l1 
+  on f.friend = l1.user_id
+left join Likes l2 
+       on f.user = l2.user_id 
+      and l1.page_id = l2.page_id
+where l2.page_id is null
+group by f.user, l1.page_id
+
+- Solution 2.
+
+with friends as (
+    select user1_id as user, user2_id as friend from Friendship
+    union all
+    select user2_id as user, user1_id as friend from Friendship
+)
+
+select 
+      f.user as user_id, 
+      l.page_id, 
+      count(f.friend) as friends_likes
+from friends f 
+left join Likes l 
+       on f.friend = l.user_id
+where not exists (
+    select 1 
+    from Likes l2 
+    where f.user = l2.user_id 
+      and l.page_id = l2.page_id
+      )
+group by 1, 2
