@@ -1,0 +1,10 @@
+2041. Accepted Candidates From the Interviews
+
+select 
+      c.candidate_id
+from Candidates c
+join Rounds r 
+  on c.interview_id = r.interview_id
+where c.years_of_exp >= 2
+group by c.candidate_id
+having sum(score) > 15
