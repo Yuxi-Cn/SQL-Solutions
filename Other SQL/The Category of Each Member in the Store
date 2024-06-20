@@ -1,0 +1,44 @@
+2051. The Category of Each Member in the Store
+
+- Solution 1.
+
+with conversion as(
+    select 
+          m.member_id, 
+          m.name, 
+          count(v.visit_id) as visit, 
+          ifnull(
+            (100 * count(p.visit_id)) / count(v.visit_id)
+            , 0) as conversion_rate
+    from Members m
+    left join Visits v using(member_id)
+    left join Purchases p on v.visit_id = p.visit_id
+    group by m.member_id
+)
+
+select 
+      member_id, 
+      name, 
+      case 
+          when conversion_rate >= 80 then "Diamond"
+          when conversion_rate >= 50 then "Gold"
+          when conversion_rate = 0 and visit = 0 then "Bronze"
+          else "Silver"
+      end as category
+from conversion
+
+- Solution 2.
+
+select
+      m.member_id,
+      m.name,
+      case 
+        when ifnull(100 * count(p.visit_id) / count(v.visit_id), 0) >= 80 then "Diamond"
+        when ifnull(100 * count(p.visit_id) / count(v.visit_id), 0) >= 50 then "Gold"
+        when count(v.visit_id) = 0 then "Bronze"
+        else "Silver"
+      end as category
+from Members m
+left join Visits v using(member_id)
+left join Purchases p on v.visit_id = p.visit_id
+group by m.member_id
