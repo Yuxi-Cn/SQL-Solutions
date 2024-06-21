@@ -1,13 +1,17 @@
 1990. Count the Number of Experiments
 
 with platforms as (
-    select 'Android' as platform union all
-    select 'IOS' union all
+    select 'Android' as platform 
+    union all
+    select 'IOS' 
+    union all
     select 'Web'
 ),
 experimentnames as (
-    select 'Reading' as experiment_name union all
-    select 'Sports' union all
+    select 'Reading' as experiment_name 
+    union all
+    select 'Sports' 
+    union all
     select 'Programming'
 ),
 allcombinations as (
@@ -20,8 +24,13 @@ experimentcounts as (
     from experiments
     group by platform, experiment_name
 )
-select ac.platform, ac.experiment_name, ifnull(ec.num_experiments, 0) as num_experiments
+
+select 
+      ac.platform, 
+      ac.experiment_name, 
+      ifnull(ec.num_experiments, 0) as num_experiments
 from allcombinations ac
 left join experimentcounts ec
-on ac.platform = ec.platform and ac.experiment_name = ec.experiment_name
-order by ac.platform, ac.experiment_name;
+       on ac.platform = ec.platform 
+      and ac.experiment_name = ec.experiment_name
+order by ac.platform, ac.experiment_name
