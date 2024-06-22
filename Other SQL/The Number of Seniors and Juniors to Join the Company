@@ -1,0 +1,28 @@
+2004. The Number of Seniors and Juniors to Join the Company
+
+with total_salary as (
+select 
+      employee_id, 
+      experience, 
+      sum(salary) over(partition by experience order by salary asc, employee_id) as budget
+from Candidates
+)
+
+  select 
+        "Senior" as experience, 
+        count(employee_id) as accepted_candidates
+  from total_salary
+  where experience = "Senior" 
+  and budget <= 70000
+union
+  select 
+        "Junior" as exeperience, 
+        count(employee_id) as accepted_candidates
+  from total_salary
+  where experience = "Junior" 
+  and budget <= (70000 - 
+    (select ifnull(max(budget),0) 
+    from total_salary 
+    where experience = "Senior" 
+    and budget <= 70000)
+    )
