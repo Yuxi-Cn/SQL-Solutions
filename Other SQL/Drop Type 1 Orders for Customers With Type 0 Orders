@@ -1,0 +1,44 @@
+2084. Drop Type 1 Orders for Customers With Type 0 Orders
+
+- Solution 1.
+
+with customer as (
+    select 
+          * 
+    from Orders
+    where order_type = 0
+)
+select 
+      * 
+from Orders
+where order_id not in (
+    select o.order_id
+    from customer c
+    join orders o using(customer_id)
+    where o.order_type = 1
+    )
+
+- Solution 2.
+
+select 
+      order_id, 
+      customer_id, 
+      order_type 
+from (
+    select 
+          *, 
+          rank() over(partition by customer_id order by order_type) as rk
+    from Orders
+    ) temp1
+where rk=1
+
+- Solution 3.
+
+select 
+      *
+from Orders
+where (customer_id, order_type) in (
+    select customer_id, min(order_type)
+    from Orders
+    group by customer_id
+)
