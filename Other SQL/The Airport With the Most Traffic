@@ -1,0 +1,18 @@
+2112. The Airport With the Most Traffic
+
+with traffic as (
+select departure_airport as airport, sum(flights_count) as cnt from Flights group by airport
+union
+select arrival_airport as airport, sum(flights_count) as cnt from Flights group by airport
+)
+
+select airport as airport_id 
+from (
+    select 
+          airport, 
+          sum(cnt) as cnt, 
+          dense_rank() over(order by sum(cnt) desc) as rk
+    from traffic
+    group by airport
+) temp1
+where rk = 1
