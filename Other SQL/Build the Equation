@@ -1,0 +1,27 @@
+2118. Build the Equation
+
+select 
+      concat(
+        group_concat(
+            case
+                when power = 1 then 
+                  case
+                      when factor > 0 then concat("+", factor, "X")
+                      else concat(factor, "X")
+                  end
+                when power = 0 then
+                  case
+                      when factor > 0 then concat("+", factor)
+                      else concat(factor)
+                  end
+                else
+                  case
+                      when factor > 0 then concat("+", factor, "X", "^", power)
+                      else concat(factor, "X", "^", power)
+                  end
+            end
+            order by power desc separator ""
+        ), 
+        "=0"
+    ) as equation
+from Terms
