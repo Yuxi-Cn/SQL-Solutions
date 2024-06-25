@@ -1,0 +1,40 @@
+2142. The Number of Passengers in Each Bus I
+
+- Solution 1.
+
+with bus_arrival as (
+    select 
+          *, 
+          ifnull(lag(arrival_time) over(order by arrival_time),0) as pre_arrival
+    from Buses
+)
+
+select 
+      b.bus_id, 
+      count(p.passenger_id) as passengers_cnt
+from bus_arrival b
+left join Passengers p 
+       on p.arrival_time <= b.arrival_time 
+       and p.arrival_time > b.pre_arrival
+group by b.bus_id
+order by bus_id asc
+
+
+- Solution 2.
+
+select 
+      b.bus_id, 
+      ifnull(count(passenger_id),0) as passengers_cnt
+from Buses b
+left join(
+    select 
+          p.passenger_id, 
+          min(b.arrival_time) as bus_arrival
+    from Buses b
+    join Passengers p
+        on p.arrival_time <= b.arrival_time
+    group by passenger_id
+) temp1 
+on b.arrival_time = temp1.bus_arrival
+group by bus_id
+order by bus_id
