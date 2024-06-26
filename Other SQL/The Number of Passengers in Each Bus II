@@ -1,0 +1,53 @@
+2153. The Number of Passengers in Each Bus II
+
+with recursive
+
+bus_timeline as (
+    select 
+          bus_id, 
+          arrival_time, 
+          capacity, 
+          ifnull(lag(arrival_time) over(order by arrival_time), 0) as prev_bus_arrival
+    from Buses
+),
+
+passenger_count as (
+    select 
+          bt.bus_id, 
+          bt.arrival_time, 
+          bt.capacity, 
+          bt.prev_bus_arrival, 
+          count(p.passenger_id) as pas_cnt, 
+          row_number() over(order by bt.arrival_time) as rn
+    from bus_timeline bt
+    left join Passengers p 
+           on p.arrival_time <= bt.arrival_time 
+           and p.arrival_time > bt.prev_bus_arrival
+    group by bt.bus_id, bt.arrival_time, bt.capacity
+),
+
+boarding_status as (
+    select 
+          rn, 
+          bus_id, 
+          least(pas_cnt, capacity) as boarded, 
+          (pas_cnt - least(pas_cnt, capacity)) as remaining
+    from passenger_count
+    where rn = 1
+
+    union all
+
+    select 
+          pc.rn, 
+          pc.bus_id, 
+          least(capacity, pas_cnt + remaining) as boarded, 
+          (pas_cnt + remaining) - least(capacity, pas_cnt + remaining) as remaining
+    from passenger_count pc, boarding_status bs
+    where pc.rn = bs.rn + 1
+)
+
+select 
+      bus_id, 
+      boarded as passengers_cnt 
+from boarding_status
+order by bus_id
