@@ -1,0 +1,24 @@
+2298. Tasks Count in the Weekend
+
+- Solution 1.
+
+select 
+      sum(case when day_type = "weekend" then 1 else 0 end) as weekend_cnt,
+      sum(case when day_type = "workday" then 1 else 0 end) as working_cnt
+from
+(
+select 
+      task_id, 
+      case 
+          when date_format(submit_date, "%w") in (0, 6) then "weekend" 
+          else "workday" 
+      end as day_type
+from tasks
+) temp1
+
+- Solution 2.
+
+select 
+      sum(weekday(submit_date) >= 5) as weekend_cnt, 
+      sum(weekday(submit_date) < 5) as working_cnt
+from tasks
