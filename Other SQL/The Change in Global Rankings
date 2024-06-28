@@ -1,0 +1,28 @@
+2175. The Change in Global Rankings
+
+with original_rank as (
+    select 
+          team_id, 
+          name, 
+          points, 
+          rank() over(order by points desc, name) as rk
+    from TeamPoints
+),
+update_rank as(
+    select 
+          t.team_id, 
+          t.name, 
+          (t.points + p.points_change) as new_points, 
+          rank() over(order by (t.points + p.points_change) desc, t.name) as rk
+    from TeamPoints t
+    left join PointsChange p using(team_id)
+    order by new_points desc
+)
+
+select  
+      o.team_id, 
+      o.name, 
+      cast(o.rk as signed) - cast(u.rk as signed) as rank_diff
+from original_rank o
+join update_rank u 
+  on o.team_id = u.team_id
