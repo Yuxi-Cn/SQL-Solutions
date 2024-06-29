@@ -1,0 +1,71 @@
+2292. Products With Three or More Orders in Two Consecutive Years
+
+- Solution 1.
+
+with 
+    order_info as (
+        select 
+              product_id, 
+              year(purchase_date) as order_year, 
+              count(*) as order_count
+        from Orders
+        group by product_id, year(purchase_date)
+        having count(order_id) >= 3
+),
+    annual_order as (
+        select 
+            o1.product_id,
+            o1.order_year as year1,
+            o1.order_count as count1,
+            o2.order_year as year2,
+            o2.order_count as count2
+        from order_info o1
+        join order_info o2
+        on o1.product_id = o2.product_id
+        and o1.order_year = o2.order_year - 1
+        group by o1.product_id
+    )
+
+select 
+      product_id
+from annual_order
+group by product_id
+having sum(count1) >= 3 
+   and sum(count2) >= 3
+
+
+- Solution 2.
+
+with order_info as (
+    select 
+          product_id, 
+          year(purchase_date) as year
+    from orders
+    group by product_id, year(purchase_date)
+    having count(order_id) >= 3
+)
+
+select 
+      distinct o1.product_id 
+from order_info o1
+join order_info o2
+  on o1.product_id = o2.product_id
+ and o1.year = o2.year - 1
+
+
+- Solution 3.
+
+with cte as (
+    select 
+          product_id, 
+          year(purchase_date) as year1,
+          lead(year(purchase_date)) over(partition by product_id order by year(purchase_date)) as year2
+    from orders
+    group by product_id, year(purchase_date)
+    having count(order_id) >= 3
+)
+
+select 
+      distinct product_id 
+from cte
+where year1 + 1 = year2
