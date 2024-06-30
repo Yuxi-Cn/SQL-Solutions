@@ -1,0 +1,44 @@
+2238. Number of Times a Driver Was a Passenger
+
+- Solution 1.
+
+select 
+      distinct r1.driver_id, 
+      coalesce(r2.cnt, 0) as cnt
+from rides r1
+left join (
+    select 
+          passenger_id, 
+          count(passenger_id) as cnt
+    from rides
+    group by passenger_id
+) r2
+on r1.driver_id = r2.passenger_id
+
+
+- Solution 2.
+
+select 
+      r1.driver_id, 
+      count(r2.passenger_id) as cnt
+from (
+    select 
+          distinct driver_id 
+    from rides
+    ) r1
+left join rides r2 
+       on r1.driver_id = r2.passenger_id
+group by r1.driver_id
+
+
+- Solution 3.
+
+select 
+      r1.driver_id, 
+      ifnull(
+        count(distinct r2.ride_id)
+        , 0) as cnt
+from rides r1
+left join rides r2 
+       on r1.driver_id = r2.passenger_id
+group by r1.driver_id
