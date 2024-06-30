@@ -1,0 +1,35 @@
+2173. Longest Winning Streak
+
+with match_rank as (
+    select 
+        player_id, 
+        match_day, 
+        result, 
+        row_number() over(partition by player_id order by match_day) as rn1,
+        row_number() over(partition by player_id, case when result = "Win" then 1 else 0 end order by match_day) as rn2,
+        row_number() over(partition by player_id order by match_day) 
+        - row_number() over(partition by player_id, case when result = "Win" then 1 else 0 end order by match_day) as streak_diff
+    from Matches
+),
+win_streak as (
+    select 
+        player_id, 
+        match_day, 
+        count(*) as streak_length
+    from match_rank
+    where result = "Win"
+    group by player_id, result, streak_diff
+),
+longest_win_streak as (
+    select 
+          player_id, 
+          max(streak_length) as longest_streak
+    from win_streak
+    group by player_id
+)
+
+select 
+      distinct m.player_id, 
+      ifnull(lws.longest_streak, 0) as longest_streak
+from matches m
+left join longest_win_streak lws using(player_id)
