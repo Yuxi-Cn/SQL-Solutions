@@ -1,0 +1,23 @@
+2159. Order Two Columns Independently
+
+with col_1 as (
+    select 
+          first_col, 
+          row_number() over(order by first_col) as rn
+    from Data
+    order by 1
+),
+col_2 as (
+    select 
+          second_col, 
+          row_number() over(order by second_col desc) as rn
+    from Data
+    order by 1 desc
+)
+
+select 
+      c1.first_col, 
+      c2.second_col
+from col_1 c1
+join col_2 c2 on c1.rn = c2.rn
+order by c1.first_col
