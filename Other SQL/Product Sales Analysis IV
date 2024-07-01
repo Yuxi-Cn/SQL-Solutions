@@ -1,0 +1,46 @@
+2324. Product Sales Analysis IV
+
+- Solution 1.
+
+with spend_table as(
+    select 
+          s.user_id, 
+          s.product_id, 
+          sum(s.quantity) * p.price as spending
+    from sales s
+    left join product p using(product_id)
+    group by s.user_id, s.product_id
+),
+max_spending as (
+    select 
+          user_id, 
+          product_id, 
+          max(spending) as max_spend
+    from spend_table
+    group by user_id
+)
+
+select 
+      st.user_id, 
+      st.product_id
+from spend_table st
+join max_spending ms
+  on st.user_id = ms.user_id 
+ and ms.max_spend = st.spending
+
+- Solution 2.
+
+select 
+      user_id, 
+      product_id 
+from (
+    select 
+          s.user_id, 
+          s.product_id, 
+          sum(s.quantity) * p.price as amount, 
+          rank() over(partition by user_id order by sum(s.quantity) * p.price desc) as rk
+    from sales s
+    join product p using(product_id)
+    group by user_id, product_id
+) spending_rank
+where rk = 1
