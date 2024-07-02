@@ -1,0 +1,14 @@
+2314. The First Day of the Maximum Recorded Degree in Each City
+
+select 
+      city_id, 
+      min(day) as day, 
+      degree
+from (
+    select 
+          *, 
+          rank() over(partition by city_id order by degree desc) as rk
+    from weather
+) degree_rank
+where rk = 1
+group by city_id
