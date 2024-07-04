@@ -1,0 +1,30 @@
+2199. Finding the Topic of Each Post
+
+- Solution 1.
+
+select 
+      post_id, 
+      case
+          when group_concat(distinct topic_id order by topic_id) is null then "Ambiguous!"
+          else group_concat(distinct topic_id order by topic_id)
+      end as topic
+from (
+    select 
+          p.post_id, 
+          k.topic_id
+    from Posts p
+    left join Keywords k
+        on regexp_like(lower(p.content), concat('\\b',lower(k.word),'\\b')) > 0
+) temp1
+group by post_id
+
+- Solution 2.
+
+select 
+      p.post_id,
+      ifnull(group_concat(distinct k.topic_id), "Ambiguous!") as topic
+from Posts p
+left join Keywords k
+       on concat(' ', lower(p.content), ' ') like concat('% ', lower(k.word), ' %')
+group by post_id
+order by topic_id
