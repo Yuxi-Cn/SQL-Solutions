@@ -1,0 +1,34 @@
+2072. The Winner University
+
+- Solution 1.
+
+with uni_cte as (
+    select count(student_id) as excellence, 'New York University' as uni
+    from NewYork
+    where score >= 90
+    union
+    select count(student_id) as excellence, 'California University' as uni
+    from California
+    where score >= 90
+)
+
+select 
+      case
+      when max(excellence) = min(excellence) then 'No Winner'
+      else (select uni from uni_cte order by excellence desc limit 1)
+      end as winner
+from uni_cte
+
+
+- Solution 2.
+
+select 
+    case 
+        when count(*) < (select count(student_id) from NewYork where score >= 90) 
+            then 'New York University'
+        when count(*) > (select count(student_id) from NewYork where score >= 90) 
+            then 'California University'
+        else 'No Winner' 
+    end as winner
+from California 
+where score >= 90
