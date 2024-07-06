@@ -1,0 +1,46 @@
+2308. Arrange Table by Gender
+
+- Solution 1.
+
+with f_gender as (
+    select user_id, gender, row_number() over(partition by gender order by user_id) as rn
+    from Genders
+    where gender = 'female'
+),
+m_gender as (
+    select user_id, gender, row_number() over(partition by gender order by user_id) as rn
+    from Genders
+    where gender = 'other'
+),
+o_gender as (
+    select user_id, gender, row_number() over(partition by gender order by user_id) as rn
+    from Genders
+    where gender = 'male'
+),
+comb_gender as (
+    select user_id, gender, rn from f_gender
+    union all
+    select user_id, gender, rn from o_gender 
+    union all
+    select user_id, gender, rn from m_gender 
+)
+
+select user_id, gender
+from comb_gender
+order by rn, field(gender, 'female','other','male')
+
+
+- Solution 2.
+
+with sortgender as (
+    select 
+          user_id, 
+          gender, 
+          row_number() over(partition by gender order by user_id) as rn
+    from Genders
+)
+select 
+      user_id, 
+      gender
+from sortgender
+order by rn, field(gender, 'female','other','male')
