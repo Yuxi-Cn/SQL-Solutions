@@ -44,3 +44,19 @@ select
       gender
 from sortgender
 order by rn, field(gender, 'female','other','male')
+
+
+- Solution 3.
+
+select user_id, gender
+from Genders
+order by dense_rank() over(partition by gender order by user_id), 
+length(gender) desc
+
+
+- Solution 4.
+
+select user_id, gender
+from Genders
+order by rank() over(partition by gender order by user_id), 
+if(gender='female', 0, if(gender='other', 1, 2))
