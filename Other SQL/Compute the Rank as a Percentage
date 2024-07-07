@@ -1,0 +1,30 @@
+2346. Compute the Rank as a Percentage
+
+- Solution 1.
+
+select 
+      student_id, 
+      department_id, 
+      round(
+        ifnull(
+            (rk - 1) * 100 / (stu_number - 1)
+            , 0)
+        , 2) as percentage
+from (
+select 
+      student_id, 
+      department_id, 
+      rank() over(partition by department_id order by mark desc) as rk,
+      count(student_id) over(partition by department_id) as stu_number
+from Students
+) temp1
+
+- Solution 2.
+
+select 
+      student_id, 
+      department_id, 
+      round(
+        percent_rank() over(partition by department_id order by mark desc)
+         * 100, 2) as percentage
+from Students
