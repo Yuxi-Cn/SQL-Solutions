@@ -1,0 +1,21 @@
+2388. Change Null Values in a Table to the Previous Value
+
+with cte_rn as (
+    select 
+          row_number() over() as rn, 
+          id, 
+          drink
+    from coffeeshop
+),
+cte_grp as (
+    select 
+          id, 
+          drink,
+          rn,
+          sum(if(drink is null, 0, 1)) over (order by rn) as grp
+    from cte_rn
+)
+select 
+      id, 
+      first_value(drink) over(partition by grp order by rn) as drink
+from cte_grp
