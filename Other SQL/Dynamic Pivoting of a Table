@@ -1,0 +1,45 @@
+2252. Dynamic Pivoting of a Table
+
+- Solution 1.
+
+CREATE PROCEDURE PivotProducts()
+BEGIN
+	# Write your MySQL query statement below.
+set session group_concat_max_len = 1000000;
+
+set @case_stmt = null;
+select group_concat(distinct concat('sum(case when store = "', store, '" then price end) as ', store))
+into @case_stmt
+from products;
+
+set @sql_query = concat('select product_id, ', @case_stmt, ' from products group by product_id');
+
+prepare final_sql_query from @sql_query;
+execute final_sql_query;
+deallocate prepare final_sql_query;
+
+END
+
+
+- Solution 2.
+
+CREATE PROCEDURE PivotProducts()
+BEGIN
+
+    set group_concat_max_len = 1000000;
+    set @store_pivot = null;
+    select group_concat(
+                distinct concat(
+                'sum(if(store = "', store, '", price, null)) as ', store) 
+            order by store)
+    into @store_pivot
+    from products;
+
+    set @store_pivot = concat('select product_id, ', @store_pivot, ' from products group by product_id');
+
+
+    prepare pivot_stmt from @store_pivot;
+    execute pivot_stmt;
+    deallocate prepare pivot_stmt;
+
+END
