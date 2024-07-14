@@ -1,0 +1,43 @@
+2394. Employees With Deductions
+
+- Solution 1.
+
+with cte_work as (
+    select 
+          employee_id, 
+          sum(
+            ceil(
+                timestampdiff(second, in_time, out_time) 
+                / 60.0)
+                ) as work_minutes
+    from logs
+    group by employee_id
+),
+cte_remain as (
+    select 
+          e.employee_id, 
+          ifnull(
+            needed_hours * 60 - work_minutes, needed_hours * 60
+            ) as remaining_minutes
+    from employees e
+    left join cte_work cw using(employee_id)
+)
+select employee_id
+from cte_remain
+where remaining_minutes > 0
+
+
+- Solution 2.
+
+select 
+      e.employee_id
+from employees e
+left join logs l using(employee_id)
+group by e.employee_id, e.needed_hours
+having sum(
+            ceil(
+                ifnull(
+                    timestampdiff(second, in_time, out_time) 
+                , 0)
+            / 60)
+        ) / 60 < e.needed_hours
