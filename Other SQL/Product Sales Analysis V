@@ -1,0 +1,15 @@
+2329. Product Sales Analysis V
+
+select 
+      user_id, 
+      sum(spending_p) as spending
+from (
+    select 
+          s.user_id, 
+          sum(s.quantity) * p.price as spending_p
+    from sales s
+    left join product p using(product_id)
+    group by user_id, product_id
+) temp1
+group by user_id
+order by spending desc
