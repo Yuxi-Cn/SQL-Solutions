@@ -1,0 +1,21 @@
+2362. Generate the Invoice
+
+with cte as (
+    select 
+          invoice_id, 
+          p1.product_id, 
+          sum(quantity * price) as prices 
+    from Purchases p1
+    left join Products p2 using(product_id)
+    group by invoice_id
+    order by prices desc, invoice_id
+)
+
+select 
+      p1.product_id, 
+      p1.quantity, 
+      sum(p1.quantity * p2.price) as price
+from Purchases p1
+left join Products p2 using(product_id)
+where p1.invoice_id = (select invoice_id from cte limit 1)
+group by product_id
