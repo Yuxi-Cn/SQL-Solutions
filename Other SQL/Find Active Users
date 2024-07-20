@@ -1,0 +1,27 @@
+2688. Find Active Users
+
+- Solution 1.
+
+with cte as (
+    select 
+          *, 
+          row_number() over(partition by user_id order by created_at) as rn
+    from Users
+)
+select distinct a.user_id
+from cte a
+join cte b on a.user_id = b.user_id
+where a.rn <> b.rn
+and abs(datediff(a.created_at, b.created_at)) <= 7
+
+- Solution 2.
+
+with cte as (
+    select 
+          *, 
+          lead(created_at, 1) over(partition by user_id order by created_at) as next_purchase
+    from Users
+)
+select distinct user_id
+from cte 
+where next_purchase <= date_add(created_at, interval 7 day)
