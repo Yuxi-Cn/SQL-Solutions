@@ -1,0 +1,21 @@
+2854. Rolling Average Steps
+
+select
+      user_id, 
+      steps_date, 
+      rolling_average
+from (
+    select 
+        user_id, 
+        steps_date, 
+        round(
+            avg(steps_count) over(
+                partition by user_id 
+                order by steps_date 
+                rows between 2 preceding and current row)
+                , 2) as rolling_average,
+        lag(steps_date, 2) over(partition by user_id order by steps_date) as two_date_before
+    from Steps
+) temp1
+where datediff(steps_date, two_date_before) = 2
+order by user_id, steps_date
