@@ -1,0 +1,28 @@
+2668. Find Latest Salaries
+
+- Solution 1.
+
+select 
+      emp_id, 
+      firstname, 
+      lastname, 
+      max(salary) as salary, 
+      department_id
+from Salary
+group by emp_id
+order by emp_id
+
+- Solution 2.
+
+select s.*
+from salary s
+join (
+    select 
+          emp_id, 
+          max(salary) as salary 
+    from salary 
+    group by emp_id
+    ) t
+on s.emp_id = t.emp_id 
+and s.salary = t.salary
+order by s.emp_id
