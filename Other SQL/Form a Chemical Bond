@@ -1,0 +1,21 @@
+2480. Form a Chemical Bond
+
+- Solution 1.
+
+select 
+      e1.symbol as metal, 
+      e2.symbol as nonmetal
+from Elements e1, Elements e2
+where e1.type = 'Metal' 
+and e2.type = 'Nonmetal'
+
+
+- Solution 2.
+
+select 
+      e1.symbol as metal, 
+      e2.symbol as nonmetal
+from Elements e1
+join Elements e2 
+on e1.type = 'Metal' 
+and e2.type = 'Nonmetal'
