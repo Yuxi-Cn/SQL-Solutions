@@ -1,0 +1,63 @@
+2820. Election Results
+
+- Solution 1.
+
+with vote_counts as (
+    select 
+          voter, 
+          count(*) as vote_count
+    from Votes
+    where candidate is not null
+    group by voter
+),
+fractional_vote as (
+    select 
+          v.voter,
+          v.candidate,
+          1 / vc.vote_count as vote_num
+    from Votes v
+    join vote_counts vc using(voter)
+),
+vote_result as (
+    select 
+          candidate, 
+          sum(vote_num) as vote_num
+    from fractional_vote
+    group by candidate
+)
+
+select candidate
+from (
+    select 
+          andidate, 
+          rank() over(order by vote_num desc) as rk
+    from vote_result
+    ) temp1
+where rk = 1
+order by candidate
+
+
+- Solution 2.
+
+with vote_counts as (
+    select 
+          voter, 
+          count(*) as vote_count
+    from Votes
+    where candidate is not null
+    group by voter
+),
+fractional_vote as (
+    select 
+          v.voter,
+          v.candidate,
+          sum(1 / vc.vote_count) as vote_num
+    from Votes v
+    join vote_counts vc using(voter)
+    group by v.candidate
+)
+
+select candidate
+from fractional_vote
+where vote_num = (select max(vote_num) from fractional_vote)
+order by candidate
