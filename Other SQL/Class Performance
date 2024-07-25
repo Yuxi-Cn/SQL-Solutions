@@ -1,0 +1,35 @@
+2989. Class Performance
+
+- Solution 1.
+
+with cte as (
+    select 
+        student_id, 
+        (assignment1 + assignment2 + assignment3) as total_score
+    from Scores
+    order by (assignment1 + assignment2 + assignment3)
+)
+select 
+    (select total_score from cte order by total_score desc limit 1)
+    - (select total_score from cte limit 1) as difference_in_score
+
+
+- Solution 2.
+
+with cte as (
+    select 
+        student_id, 
+        (assignment1 + assignment2 + assignment3) as total_score,
+        rank() over(order by (assignment1 + assignment2 + assignment3) desc) as rk1,
+        rank() over(order by (assignment1 + assignment2 + assignment3)) as rk2
+    from Scores
+    group by student_id
+    order by (assignment1 + assignment2 + assignment3)
+)
+select 
+    (select total_score from cte
+    where rk1 = (select min(rk1) from cte) limit 1)
+    -
+    (select total_score from cte
+    where rk1 = (select max(rk1) from cte) limit 1)
+as difference_in_score
