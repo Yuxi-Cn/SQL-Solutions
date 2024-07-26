@@ -1,0 +1,41 @@
+2990. Loan Types
+
+- Solution 1.
+
+with cte1 as (
+    select user_id
+    from Loans
+    where loan_type = "Refinance" 
+),
+cte2 as (
+    select user_id
+    from Loans
+    where loan_type = "Mortgage"
+)
+select distinct user_id
+from cte1 
+join cte2 using(user_id)
+order by user_id 
+
+
+- Solution 2.
+
+select distinct user_id 
+from loans 
+where loan_type = "Mortgage" 
+and user_id in(
+    select user_id 
+    from Loans 
+    where loan_type = "Refinance"
+    )
+order by user_id
+
+
+- Solution 3.
+
+select distinct user_id 
+from Loans 
+group by user_id
+having sum(loan_type = "Refinance") > 0
+   and sum(loan_type = "Mortgage") > 0
+order by user_id
