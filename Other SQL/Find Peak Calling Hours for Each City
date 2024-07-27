@@ -1,0 +1,47 @@
+2984. Find Peak Calling Hours for Each City
+
+- Solution 1.
+
+with cte1 as (
+    select 
+          row_number() over(order by call_time) as rn, 
+          caller_id, 
+          hour(call_time) as call_hour, 
+          city
+    from Calls
+),
+cte2 as (select 
+      city, 
+      call_hour as peak_calling_hour,
+      count(rn) as number_of_calls,
+      rank() over(partition by city order by count(rn) desc) as rk
+from cte1
+group by city, call_hour
+)
+select 
+      city, 
+      peak_calling_hour, 
+      number_of_calls 
+from cte2
+where rk = 1
+order by peak_calling_hour desc, city desc
+
+
+- Solution 2.
+
+with cte as (
+    select 
+          city, 
+          hour(call_time) as call_hour, 
+          count(*) as calls, 
+          rank() over(partition by city order by count(*) desc) as rk
+    from calls
+    group by city, call_hour
+)
+select 
+      city, 
+      call_hour as peak_calling_hour, 
+      calls as number_of_calls
+from cte
+where rk = 1
+order by call_hour desc, city desc
