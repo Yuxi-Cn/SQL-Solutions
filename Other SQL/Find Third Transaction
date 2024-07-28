@@ -1,0 +1,48 @@
+2986. Find Third Transaction
+
+- Solution 1.
+
+with cte as (
+    select 
+          user_id, 
+          spend, 
+          transaction_date, 
+          row_number() over(partition by user_id order by transaction_date) as rn
+    from Transactions
+    order by user_id, transaction_date
+    )
+select 
+      distinct c.user_id, 
+      c.spend as third_transaction_spend, 
+      c.transaction_date as third_transaction_date
+from cte c
+join cte a 
+    on c.user_id = a.user_id 
+    and c.rn - 1 = a.rn
+join cte b 
+    on c.user_id = b.user_id 
+    and a.rn - 1 = b.rn
+where c.rn = 3 
+     and c.spend > a.spend 
+     and c.spend > b.spend
+order by a.user_id 
+
+
+- Solution 2.
+
+with third_transaction as (
+    select 
+          *,
+          row_number() over(partition by user_id order by transaction_date) as rn,
+          lag(spend) over(partition by user_id order by transaction_date) as second_spend,
+          lag(spend,2) over(partition by user_id order by transaction_date) as first_spend
+    from Transactions
+)
+select 
+      user_id, 
+      spend as third_transaction_spend, 
+      transaction_date as third_transaction_date 
+from third_transaction
+where rn = 3
+  and spend > second_spend
+  and spend > first_spend
