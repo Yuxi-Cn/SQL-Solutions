@@ -1,0 +1,45 @@
+2738. Count Occurrences in Text
+
+- Solution 1.
+
+with word_counts as (
+    select 'bull' as word
+    union
+    select 'bear' as word
+),
+counts as (
+    select 
+          w.word, 
+          count(*) as count
+    from word_counts w
+    join Files f
+    on f.content regexp concat("\\s", w.word, "\\s")
+    group by w.word
+)
+select * from counts
+
+
+- Solution 2.
+
+select 
+      'bull' as word, 
+      sum(content like "% bull %") as count
+from files
+union all
+select 
+      'bear' as word, 
+      sum(content like "% bear %") as count
+from files
+
+
+- Solution 3.
+
+select c.word, count(*) as count
+from(
+    select 'bull' as word
+    union 
+    select 'bear' as word
+) c
+join files f
+on f.content regexp concat('\\s', c.word, '\\s')
+group by c.word
