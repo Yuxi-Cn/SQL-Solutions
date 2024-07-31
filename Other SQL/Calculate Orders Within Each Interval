@@ -1,0 +1,36 @@
+2893. Calculate Orders Within Each Interval
+
+- Solution 1.
+
+with recursive cte as (
+    select
+          *,
+        ceil(minute/6) as interval_no 
+    from orders
+)
+select 
+      interval_no,
+      sum(order_count) as total_orders
+from cte
+group by interval_no
+order by interval_no
+
+
+- Solution 2.
+
+select 
+      if(minute % 6 = 0, minute/6, ceil(minute/6)) as interval_no,
+      sum(order_count) as total_orders
+from orders
+group by 1
+order by 1
+
+
+- Solution 3.
+
+select 
+      ceil(minute/6) as interval_no,
+      sum(order_count) as total_orders
+from orders
+group by ceil(minute/6)
+order by ceil(minute/6)
