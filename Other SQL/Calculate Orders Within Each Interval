@@ -2,6 +2,29 @@
 
 - Solution 1.
 
+with recursive max_interval as (
+    select 
+          ceil(max(minute) / 6) as max_int 
+    from orders
+),
+order_interval as (
+    select 1 as interval_no
+    union all
+    select interval_no + 1 as inteval_no
+    from order_interval
+    where interval_no < (select max_int from max_interval)
+)
+select 
+      oi.interval_no, 
+      sum(o.order_count) as total_orders
+from order_interval oi
+left join orders o on ceil(o.minute/6) = oi.interval_no
+group by oi.interval_no
+order by oi.interval_no
+
+
+- Solution 2.
+
 with recursive cte as (
     select
           *,
@@ -16,7 +39,7 @@ group by interval_no
 order by interval_no
 
 
-- Solution 2.
+- Solution 3.
 
 select 
       if(minute % 6 = 0, minute/6, ceil(minute/6)) as interval_no,
@@ -26,7 +49,7 @@ group by 1
 order by 1
 
 
-- Solution 3.
+- Solution 4.
 
 select 
       ceil(minute/6) as interval_no,
