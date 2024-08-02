@@ -1,0 +1,38 @@
+1369. Get the Second Most Recent Activity
+
+- Solution 1.
+
+with rk_activity as (
+    select 
+          *, 
+          rank() over(partition by username order by enddate desc) as rk
+    from Useractivity
+)
+select 
+      username, 
+      activity, 
+      startDate, 
+      endDate 
+from rk_activity
+where rk = 2
+union all
+select * from Useractivity
+group by username
+having count(*) = 1
+
+
+- Solution 2.
+
+select  
+      username, 
+      activity, 
+      startDate, 
+      endDate 
+from (
+    select 
+          *, 
+          count(username) over(partition by username) as cnt,
+          rank() over(partition by username order by endDate desc) as rk
+    from Useractivity
+) temp1
+where cnt = 1 or rk = 2
