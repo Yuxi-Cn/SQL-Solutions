@@ -20,8 +20,6 @@ BEGIN
           and `table_name`='products' 
           and `column_name` != 'product_id';
 
-    -- set @sql_query = concat('select product_id, ', @case_stmt, ' from products group by product_id');
-
     prepare sql_query from @case_stmt;
     execute sql_query;
     deallocate prepare sql_query;
