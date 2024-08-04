@@ -1,0 +1,41 @@
+2494. Merge Overlapping Events in the Same Hall
+
+
+with recursive event_sort as (
+    select 
+          hall_id,
+          start_day,
+          end_day
+    from HallEvents
+    order by hall_id, start_day
+),
+grouped_event as (
+    select
+          hall_id,
+          start_day,
+          end_day,
+          case 
+            when start_day <= max(end_day) over(partition by hall_id order by start_day 
+                rows between unbounded preceding and 1 preceding)
+            then 0
+            else 1
+          end as new_group
+    from event_sort
+),
+group_number as (
+    select 
+          hall_id,
+          start_day,
+          end_day,
+          sum(new_group) over(partition by hall_id order by start_day) as group_no
+    from grouped_event
+),
+merge_event as (
+    select 
+          hall_id,
+          min(start_day) as start_day,
+          max(end_day) as end_day
+    from group_number
+    group by hall_id, group_no
+)
+select * from merge_event
