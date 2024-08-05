@@ -1,0 +1,30 @@
+2230. The Users That Are Eligible for Discount
+
+- Solution 1.
+
+CREATE PROCEDURE getUserIDs(startDate DATE, endDate DATE, minAmount INT)
+BEGIN
+	# Write your MySQL query statement below.
+	select 
+          distinct user_id
+    from Purchases
+    where time_stamp between startDate and endDate
+      and amount >= minAmount
+    order by user_id;
+END
+
+
+- Solution 2.
+
+CREATE PROCEDURE getUserIDs(startDate DATE, endDate DATE, minAmount INT)
+BEGIN
+	# Write your MySQL query statement below.
+	select 
+          distinct user_id
+    from Purchases
+    where (
+        date(time_stamp) between startDate and date_sub(endDate, interval 1 day)
+        and amount >= minAmount
+        )
+    order by user_id;
+END
