@@ -1,0 +1,26 @@
+2853. Highest Salaries Difference
+
+- Solution 1.
+
+select
+      abs(
+        (select max(salary) from Salaries
+        where department = "Engineering")
+        -
+        (select max(salary) from Salaries
+        where department = "Marketing")
+    ) as salary_difference
+
+
+- Solution 2.
+
+with cte as (
+    select max(salary) as salary from Salaries
+    where department = "Engineering" 
+    union
+    select max(salary) as salary from Salaries
+    where department = "Marketing"
+)
+select 
+      abs(max(salary) - min(salary)) as salary_difference 
+from cte
