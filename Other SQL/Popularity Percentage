@@ -1,0 +1,53 @@
+2720. Popularity Percentage
+
+- Solution 1.
+
+with all_user as (
+    select distinct user1, user2 from Friends
+    union 
+    select distinct user2 as user1, user1 as user2 from Friends
+),
+friend_number as (
+    select 
+          user1, 
+          count(user2) as friends_no
+    from all_user
+    group by user1
+),
+total_users as (
+    select 
+          count(*) as total_user 
+    from friend_number
+)
+select 
+      fn.user1, 
+      round(
+        (fn.friends_no / tu.total_user)
+         * 100, 2) as percentage_popularity
+from friend_number fn
+cross join total_users tu
+group by fn.user1
+order by fn.user1
+
+
+- Solution 2.
+
+with mix_users as (
+    select user1, user2 from Friends
+    union
+    select user2, user1 from Friends
+),
+total_users as (
+    select distinct user1 from Friends
+    union
+    select distinct user2 from Friends
+)
+select 
+      user1, 
+      round(
+        count(*) / (select count(*) from total_users)
+        * 100, 2
+      ) as percentage_popularity
+from mix_users
+group by user1
+order by user1
