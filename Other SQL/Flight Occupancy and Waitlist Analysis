@@ -1,0 +1,22 @@
+2783. Flight Occupancy and Waitlist Analysis
+
+
+with booking_number as (
+    select 
+          flight_id, 
+          count(passenger_id) as booker
+    from Passengers
+    group by flight_id
+)
+select 
+      f.flight_id, 
+      ifnull(
+        least(bn.booker, f.capacity)
+            , 0) as booked_cnt,
+      ifnull(
+        greatest(0, bn.booker - f.capacity)
+            ,0) as waitlist_cnt
+from Flights f
+left join booking_number bn
+    using(flight_id)
+order by flight_id
