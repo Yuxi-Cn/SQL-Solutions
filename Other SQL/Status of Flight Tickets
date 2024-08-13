@@ -1,0 +1,19 @@
+2793. Status of Flight Tickets
+
+
+with booking as (
+    select 
+          p.passenger_id, 
+          p.flight_id, 
+          row_number() over(partition by p.flight_id order by p.booking_time) as rn, 
+          f.capacity
+    from Passengers p
+    left join Flights f 
+           on f.flight_id = p.flight_id
+)
+
+select 
+      passenger_id, 
+      if(rn <= capacity, "Confirmed", "Waitlist") as Status 
+from booking
+order by passenger_id
