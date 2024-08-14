@@ -1,0 +1,16 @@
+2978. Symmetric Coordinates
+
+
+with rn_order as (
+    select 
+          *, 
+          row_number() over(order by X) as rn
+    from Coordinates
+)
+select 
+      distinct a.X, a.Y 
+from rn_order a
+join rn_order b
+  on a.X = b.Y and a.Y = b.X and a.rn != b.rn
+where a.X <= a.Y
+order by a.X, a.Y
