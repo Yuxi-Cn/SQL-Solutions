@@ -1,6 +1,8 @@
 2978. Symmetric Coordinates
 
 
+- Solution 1.
+
 with rn_order as (
     select 
           *, 
@@ -14,3 +16,24 @@ join rn_order b
   on a.X = b.Y and a.Y = b.X and a.rn != b.rn
 where a.X <= a.Y
 order by a.X, a.Y
+
+
+- Solution 2.
+
+    select
+          distinct a.x, 
+          a.y
+    from Coordinates a, Coordinates b
+    where a.x < b.x 
+    and a.x = b.y 
+    and a.y = b.x 
+union all
+    select 
+          distinct a.x, 
+          a.y
+    from Coordinates a
+    where a.x = a.y
+    group by x
+    having count(*) > 1
+
+order by x, y
