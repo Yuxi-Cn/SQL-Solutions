@@ -1,0 +1,41 @@
+2988. Manager of the Largest Department
+
+- Solution 1.
+
+with cte as (
+    select 
+          dep_id, 
+          count(emp_id) as emp_count
+    from Employees
+    group by dep_id
+)
+select emp_name as manager_name, dep_id
+from Employees
+where position = "Manager"
+  and dep_id in (
+    select dep_id from cte where emp_count = (select max(emp_count) from cte)
+    )
+order by dep_id
+
+
+- Solution 2.
+
+with dep_rank as (
+    select 
+          dep_id, 
+          rank() over(order by count(emp_id) desc) as rk
+    from Employees
+    group by dep_id
+)
+select 
+      emp_name as manager_name, 
+      dep_id
+from Employees
+where position = "Manager"
+  and dep_id in (
+    select 
+          dep_id 
+    from dep_rank
+    where rk = 1
+  )
+order by dep_id
