@@ -1,0 +1,19 @@
+2991. Top Three Wineries
+
+with win_rk as (
+    select 
+          country, 
+          winery, 
+          sum(points) as points, 
+          rank() over(partition by country order by sum(points) desc, winery) as rk
+    from wineries
+    group by country, winery
+)
+select 
+      country, 
+      case when rk = 1 then concat(winery, " (", points, ")") end as top_winery,
+      ifnull(max(case when rk = 2 then concat(winery, " (", points, ")") end), 'No second winery') as second_winery,
+      ifnull(max(case when rk = 3 then concat(winery, " (", points, ")") end), 'No third winery') as third_winery
+from win_rk
+group by country
+order by country
