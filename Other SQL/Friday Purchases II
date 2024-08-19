@@ -1,0 +1,24 @@
+2994. Friday Purchases II
+
+with recursive cte as(
+    select 
+          1 as week_of_month,
+          '2023-11-03' as purchase_date
+    union all
+    select 
+          1 + week_of_month,
+          date_add(purchase_date, interval 7 day) 
+    from cte
+    where week_of_month < 4
+    and purchase_date < '2023-11-23'
+)
+select 
+      c.week_of_month,
+      purchase_date,
+      ifnull(sum(amount_spend), 0) as total_amount
+from Purchases p
+right join cte c using(purchase_date)
+    where year(purchase_date) = 2023
+      and month(purchase_date) = 11
+      and dayofweek(purchase_date) = 6
+group by purchase_date
