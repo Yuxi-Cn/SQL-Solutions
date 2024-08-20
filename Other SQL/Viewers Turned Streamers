@@ -1,0 +1,24 @@
+2995. Viewers Turned Streamers
+
+with cte_streamer as (
+    select 
+          distinct user_id, 
+          count(*) as cnt
+    from Sessions
+    where session_type = 'Streamer'
+    group by user_id
+),
+cte_initial as (
+    select 
+          user_id, 
+          session_start, 
+          session_type, 
+          row_number() over(partition by user_id order by session_start) as rn
+    from Sessions
+)
+select cs.user_id, cs.cnt as sessions_count
+from cte_initial ci
+join cte_streamer cs on ci.user_id = cs.user_id
+where ci.session_type = 'Viewer' 
+  and rn = 1
+order by cs.cnt desc, cs.user_id desc
