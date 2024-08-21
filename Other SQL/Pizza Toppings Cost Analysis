@@ -1,0 +1,29 @@
+3050. Pizza Toppings Cost Analysis
+
+
+- Solution 1.
+
+select 
+      concat(a.topping_name, ',', b.topping_name, ',',c.topping_name) as pizza,
+      (a.cost + b.cost + c.cost) as total_cost
+from Toppings a
+join Toppings b on a.topping_name < b.topping_name
+join Toppings c on b.topping_name < c.topping_name
+order by total_cost desc, pizza 
+
+
+- Solution 2.
+
+with cte_Toppings as (
+    select 
+          *, 
+          row_number() over(order by topping_name) as rn
+    from Toppings
+)
+select 
+      concat(a.topping_name, ',', b.topping_name, ',',c.topping_name) as pizza,
+      (a.cost + b.cost + c.cost) as total_cost
+from cte_Toppings a
+join cte_Toppings b on a.rn < b.rn
+join cte_Toppings c on b.rn < c.rn
+order by total_cost desc, pizza 
