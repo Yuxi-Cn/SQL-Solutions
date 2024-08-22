@@ -1,0 +1,36 @@
+3055. Top Percentile Fraud
+
+
+- Solution 1.
+
+with rk_cte as (
+    select 
+          *, 
+          rank() over(partition by state order by fraud_score desc) as rk
+    from Fraud
+)
+select 
+      policy_id, 
+      state, 
+      fraud_score
+from rk_cte
+where rk = 1
+order by state, fraud_score desc, policy_id
+
+
+- Solution 2.
+
+with percentile_cte as (
+    select 
+          *, 
+          rank() over(partition by state order by fraud_score desc) as rk_state,
+          count(*) over(partition by state) as total_count
+    from Fraud
+)
+select 
+      policy_id, 
+      state, 
+      fraud_score
+from percentile_cte
+where rk_state <= ceil(0.05 * total_count)
+order by state, fraud_score desc, policy_id
