@@ -1,0 +1,26 @@
+3052. Maximize Items
+
+with prime_item as (
+    select 
+          sum(square_footage) as prime_space, 
+          count(*) as prime_count
+    from Inventory
+    where item_type = 'prime_eligible'
+), 
+non_prime_item as (
+    select 
+          sum(square_footage) as non_prime_space, 
+          count(*) as non_prime_count
+    from Inventory
+    where item_type = 'not_prime'
+)
+select 
+      'prime_eligible' as item_type,
+      floor(500000 / prime_space) * prime_count as item_count
+from prime_item
+union all
+select
+      'not_prime' as item_type,
+      floor((500000 - (floor(500000 / prime_space) * prime_space)) / non_prime_space) * non_prime_count as item_count
+from prime_item, non_prime_item
+order by item_count desc
