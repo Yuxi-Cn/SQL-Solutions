@@ -1,0 +1,33 @@
+2987. Find Expensive Cities
+
+
+- Solution 1.
+
+with city_price as (
+    select 
+          city, 
+          avg(price) as price
+    from Listings
+    group by city
+)
+select city
+from city_price
+where price > (
+    select avg(price) from Listings
+)
+order by city
+
+
+- Solution 2.
+
+select 
+      city 
+from (
+    select 
+          city, 
+          avg(price) as price_city
+    from Listings
+    group by city
+) a
+where price_city > (select avg(price) from Listings)
+order by city
