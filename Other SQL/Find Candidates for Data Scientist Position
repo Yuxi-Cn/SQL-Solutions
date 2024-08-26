@@ -1,0 +1,26 @@
+3051. Find Candidates for Data Scientist Position
+
+
+- Solution 1.
+
+select
+      candidate_id
+from Candidates
+where skill in ("Python", "Tableau", "PostgreSQL")
+group by candidate_id
+having count(distinct skill) = 3
+order by candidate_id 
+
+
+- Solution 2.
+
+select 
+      distinct candidate_id 
+from Candidates
+group by candidate_id
+having sum(
+       skill="Python" 
+    or skill="Tableau" 
+    or skill="PostgreSQL"
+    ) = 3
+order by candidate_id
