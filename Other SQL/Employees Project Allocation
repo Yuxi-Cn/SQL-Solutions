@@ -1,0 +1,73 @@
+3057. Employees Project Allocation
+
+
+- Solution 1.
+
+select 
+      employee_id EMPLOYEE_ID, 
+      project_id PROJECT_ID, 
+      name EMPLOYEE_NAME, 
+      workload PROJECT_WORKLOAD
+from (
+    select 
+        p.employee_id, 
+        p.project_id, 
+        e.name, 
+        p.workload, 
+        avg(workload) over(partition by e.team) as avg_workload
+    from Project p
+    join Employees e 
+      on p.employee_id = e.employee_id
+) sub_1
+where workload > avg_workload
+order by employee_id, project_id
+
+
+- Solution 2.
+
+with team_avg_workload as (
+    select 
+          e.team, 
+          avg(p.workload) as avg_workload
+    from Employees e
+    join Project p using(employee_id)
+    group by e.team
+)
+select 
+      p.employee_id, 
+      p.project_id, 
+      e.name employee_name, 
+      p.workload project_workload
+from Project p
+join Employees e using(employee_id)
+join team_avg_workload t 
+  on e.team = t.team 
+  and p.workload > t.avg_workload
+order by employee_id, project_id
+
+
+- Solution 3.
+
+with teams as (
+    select 
+          e.employee_id, 
+          p.project_id,
+          e.name,
+          p.workload,
+          e.team
+    from Project p
+    join Employees e 
+    using(employee_id)
+)
+select 
+      employee_id, 
+      project_id,
+      name as employee_name,
+      workload as project_workload
+from teams t1
+where workload > (select 
+                        avg(workload) 
+                  from teams t2
+                  where t1.team = t2.team
+                  group by team)
+order by employee_id, project_id
