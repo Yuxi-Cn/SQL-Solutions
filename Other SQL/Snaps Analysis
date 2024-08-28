@@ -1,0 +1,29 @@
+3056. Snaps Analysis
+
+
+with total_time as(
+    select 
+        ag.age_bucket,
+        sum(ac.time_spent) total_time_spent
+    from Activities ac
+    join Age ag on ac.user_id = ag.user_id
+    group by ag.age_bucket
+    ),
+send_open as(
+    select 
+          ag.age_bucket,
+          sum(case when activity_type = 'send' then ac.time_spent end) as send_time_spent,
+          sum(case when activity_type = 'open' then ac.time_spent end) as open_time_spent,
+          tt.total_time_spent
+    from Activities ac
+    join Age ag using(user_id)
+    join total_time tt using(age_bucket)
+    group by ag.age_bucket
+)
+
+select
+      age_bucket,
+      ifnull(round((send_time_spent / total_time_spent) * 100, 2), 0) as send_perc,
+      ifnull(round((open_time_spent / total_time_spent) * 100, 2), 0) as open_perc
+from send_open
+group by age_bucket
