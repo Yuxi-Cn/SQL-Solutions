@@ -1,0 +1,30 @@
+3058. Friends With No Mutual Friends
+
+
+with list as (
+    select 
+          user_id1 as 'user',
+          user_id2 as friend
+    from Friends
+    union all
+    select 
+          user_id2 as 'user',
+          user_id1 as friend
+    from Friends
+), 
+shared_friend as (
+    select 
+          a.user as user_id1, 
+          b.user as user_id2
+    from list a, list b
+    where a.friend = b.friend
+    and a.user <> b.user
+)
+select user_id1, user_id2
+from Friends
+where (user_id1, user_id2) not in(
+    select 
+          user_id1, user_id2
+    from shared_friend
+)
+order by 1, 2
