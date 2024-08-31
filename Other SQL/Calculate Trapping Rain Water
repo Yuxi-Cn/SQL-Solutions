@@ -1,0 +1,15 @@
+3061. Calculate Trapping Rain Water
+
+with cte as (
+    select 
+          id, 
+          height,
+          max(height) over(order by id) as 'max_height_left',
+          max(height) over(order by id desc) as 'max_height_right'
+    from Heights
+)
+select 
+      sum(
+        least(max_height_left, max_height_right) - height
+        ) as 'total_trapped_water'
+from cte
