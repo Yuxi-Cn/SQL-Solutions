@@ -1,0 +1,23 @@
+3059. Find All Unique Email Domains
+
+
+- Solution 1.
+
+select 
+      substring_index(email, '@', -1) as email_domain, 
+      count(*) as count
+from Emails
+where email like "%@%.com"
+group by email_domain
+order by email_domain 
+
+
+- Solution 2.
+
+select 
+      substring(email, locate('@', email) + 1) as email_domain, 
+      count(*) as count
+from Emails
+where email regexp "^[^@]+@[a-zA-Z0-9._-]+\\.com$"
+group by email_domain
+order by email_domain 
