@@ -1,0 +1,32 @@
+3087. Find Trending Hashtags
+
+
+- Solution 1.
+
+select 
+      substring_index(
+        substring(
+            tweet, 
+            locate('#', tweet)
+            ),
+      ' ', 1) as hashtag, 
+      count(*) as hashtag_count
+from tweets
+where month(tweet_date) = 2 
+  and locate('#', tweet) > 0
+group by hashtag
+order by hashtag_count desc, hashtag desc
+limit 3
+
+
+- Solution 2.
+
+select 
+      regexp_substr(tweet, '\#[a-zA-Z]+') as hashtag, 
+      count(*) as hashtag_count
+from tweets
+where month(tweet_date) = 2 
+  and locate('#', tweet) > 0
+group by hashtag
+order by hashtag_count desc, hashtag desc
+limit 3
