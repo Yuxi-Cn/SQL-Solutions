@@ -1,6 +1,8 @@
 3118. Friday Purchase III
 
 
+- Solution 1.
+
 with weeknumbers as (
     select 1 as week_of_month union
     select 2 union
@@ -26,6 +28,44 @@ left join (
             / 7) as week_of_month,
             membership,
             sum(amount_spend) as total_amount
+    from Purchases p 
+    left join Users u using(user_id)
+    where dayofweek(purchase_date) = 6 
+      and membership in ("Premium", "VIP")
+    group by week_of_month, membership
+) p
+  on w.week_of_month = p.week_of_month 
+ and m.membership = p.membership
+group by week_of_month, membership
+order by week_of_month, membership
+
+
+- Solution 2.
+
+with recursive weeknumbers as (
+    select 1 as week_of_month
+    union all
+    select week_of_month + 1 
+    from weeknumbers
+    where week_of_month < 4
+),
+membertypes as (
+    select 'Premium' as membership union
+    select 'VIP'
+)
+select 
+      w.week_of_month,
+      m.membership,
+      coalesce(sum(p.total_amount), 0) as total_amount
+from weeknumbers w
+cross join membertypes m
+left join (
+    select 
+        floor(
+            (day(purchase_date) - 1) / 7
+            ) + 1 as week_of_month,
+        membership,
+        sum(amount_spend) as total_amount
     from Purchases p 
     left join Users u using(user_id)
     where dayofweek(purchase_date) = 6 
