@@ -1,0 +1,21 @@
+3124. Find Longest Calls
+
+select 
+      first_name, 
+      type, 
+      duration_formatted
+from (
+    select 
+        ct.first_name, 
+        cl.type, 
+        concat(
+            lpad(floor(cl.duration / 3600), 2, '0'), ':', 
+            lpad(floor((cl.duration % 3600) / 60), 2, '0'), ':', 
+            lpad(cl.duration % 60, 2, '0')
+        ) as duration_formatted, 
+        rank() over(partition by cl.type order by duration desc) as rk
+    from contacts ct
+    join calls cl on ct.id = cl.contact_id
+) subquery_1
+where rk < 4
+order by type desc, duration_formatted desc, first_name desc
