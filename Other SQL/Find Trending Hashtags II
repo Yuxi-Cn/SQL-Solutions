@@ -1,0 +1,79 @@
+3103. Find Trending Hashtags II
+
+
+- Solution 1.
+
+with recursive all_hashtags as (
+    select 
+        substring_index(
+            substring(tweet, 
+            locate("#", tweet)
+            ), 
+            " ", 
+            1
+        ) as hashtag,
+        substring(tweet, 
+          locate("#", tweet) + length(
+            substring_index(
+              substring(tweet, locate("#", tweet)), " ", 1)
+          )
+        ) as remaining_tweet
+    from Tweets
+    where locate("#", tweet) > 0
+    union all
+    select 
+        substring_index(
+            substring(remaining_tweet, 
+            locate("#", remaining_tweet)
+            ), 
+            " ", 
+            1
+        ) as hashtag,
+        substring(remaining_tweet, 
+          locate("#", remaining_tweet) + length(
+            substring_index(
+              substring(remaining_tweet, locate("#", remaining_tweet)), " ", 1)
+          )
+        ) as remaining_tweet
+    from all_hashtags
+    where locate("#", remaining_tweet) > 0
+),
+rank_cnt as (
+    select 
+          hashtag, 
+          count(hashtag) as 'count', 
+          rank() over(order by count(hashtag) desc, hashtag desc) as rk
+    from all_hashtags
+    group by hashtag
+)
+select 
+      hashtag,
+      count 
+from rank_cnt
+where rk < 4
+
+
+- Solution 2.
+
+with recursive all_hashtags as (
+    select
+          regexp_substr(tweet, "#[^\\s]+") as hashtag,
+          regexp_replace(tweet, "#[^\\s]+", "", 1, 1) as tweet
+    from tweets
+
+    union all
+
+    select 
+          regexp_substr(tweet, "#[^\\s]+") as hashtag,
+          regexp_replace(tweet, "#[^\\s]+", "", 1, 1) as tweet
+    from all_hashtags
+    where hashtag is not null
+)
+select 
+      hashtag, 
+      count(hashtag) as "count"
+from all_hashtags
+where hashtag is not null
+group by hashtag
+order by count desc, hashtag desc
+limit 3
