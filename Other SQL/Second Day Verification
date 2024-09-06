@@ -1,0 +1,11 @@
+3172. Second Day Verification
+
+select 
+      distinct user_id
+from emails e
+left join texts t using(email_id)
+where date(
+        date_sub(t.action_date, interval 1 day)
+        ) = date(e.signup_date)
+  and t.signup_action = "Verified"
+order by user_id
