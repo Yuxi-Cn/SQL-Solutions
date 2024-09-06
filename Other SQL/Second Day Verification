@@ -1,5 +1,8 @@
 3172. Second Day Verification
 
+
+- Solution 1.
+
 select 
       distinct user_id
 from emails e
@@ -8,4 +11,15 @@ where date(
         date_sub(t.action_date, interval 1 day)
         ) = date(e.signup_date)
   and t.signup_action = "Verified"
+order by user_id
+
+
+- Solution 2.
+
+select 
+      user_id
+from emails e
+left join texts t on e.email_id = t.email_id
+where t.signup_action = "Verified"
+  and datediff(t.action_date, e.signup_date) = 1
 order by user_id
