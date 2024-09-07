@@ -1,0 +1,40 @@
+3089. Find Bursty Behavior
+
+
+with feb as (
+    select *
+    from Posts
+    where post_date between "2024-02-01" and "2024-02-28"
+),
+avg_weekly as (
+    select 
+          user_id,
+          count(*) / 4.0 as avg_weekly_posts
+    from feb
+    group by user_id
+),
+day_7 as(
+    select 
+          a.user_id,
+          a.post_date,
+          count(b.post_id) as day7_post
+    from feb a, feb b
+    where a.user_id = b.user_id
+      and b.post_date between a.post_date and a.post_date + interval 6 day
+    group by a.post_id, a.post_date
+),
+max_day7 as (
+    select 
+          user_id,
+          max(day7_post) as max_7day_posts
+    from day_7
+    group by user_id
+)
+select 
+      m.user_id,
+      m.max_7day_posts,
+      a.avg_weekly_posts
+from max_day7 m
+inner join avg_weekly a using(user_id)
+having (a.avg_weekly_posts * 2 <= m.max_7day_posts)
+order by user_id 
