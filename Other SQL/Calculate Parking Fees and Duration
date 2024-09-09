@@ -1,0 +1,34 @@
+3166. Calculate Parking Fees and Duration
+
+with time_spent as (
+    select 
+          car_id, 
+          lot_id, 
+          sum(timestampdiff(second, entry_time, exit_time) / 3600) as hour_spent
+    from ParkingTransactions
+    group by car_id, lot_id
+)
+, max_time_lot as (
+    select 
+          car_id, 
+          lot_id,
+          rank() over(partition by car_id order by hour_spent desc) as rk
+    from time_spent
+)
+, fee_paid as (
+    select 
+          car_id,
+          sum(fee_paid) as total_fee_paid,
+          round(sum(fee_paid) / sum(timestampdiff(second, entry_time, exit_time) / 3600), 2) as avg_hourly_fee
+    from ParkingTransactions
+    group by car_id
+)
+select 
+      f.car_id, 
+      f.total_fee_paid,
+      f.avg_hourly_fee,
+      m.lot_id as most_time_lot
+from fee_paid f
+join max_time_lot m using(car_id) where rk = 1
+group by car_id
+order by car_id
