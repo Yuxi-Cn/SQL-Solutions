@@ -1,8 +1,28 @@
 1285. Find the Start and End Number of Continuous Ranges
 
+
+- Solution 1.
+
 select min(log_id) as start_id, max(log_id) as end_id
 from (
     select log_id, row_number() over(order by log_id) as rn
     from logs
 ) as sub1
 group by log_id - rn
+
+
+- Solution 2. (T-SQL)
+
+with cte as (
+    select 
+        log_id,
+        row_number() over(order by log_id) as rn,
+        row_number() over(order by log_id) - log_id as diff
+    from Logs
+)
+select 
+      min(log_id) as start_id,
+      max(log_id) as end_id
+from cte
+group by diff
+order by start_id
