@@ -1,0 +1,28 @@
+3182. Find Top Scoring Students
+
+- Solution 1. (T-SQL)
+
+with info as (
+    select
+        distinct s.student_id,
+        s.major,
+        c.course_id,
+        e.grade
+    from students s
+    left join courses c on s.major = c.major
+    left join enrollments e on s.student_id = e.student_id and c.course_id = e.course_id
+    where e.grade = 'A'
+)
+, major_course as (
+    select 
+          major,
+          count(course_id) as course_cnt
+    from courses
+    group by major
+)
+select
+      i.student_id
+from info i
+group by i.student_id, i.major
+having count(distinct i.course_id) = (select mc.course_cnt from major_course mc where mc.major = i.major)
+order by student_id
