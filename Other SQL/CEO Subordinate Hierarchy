@@ -1,0 +1,33 @@
+3236. CEO Subordinate Hierarchy
+
+
+- Solution 1. (T-SQL)
+
+with hierarchy as (
+  select 
+    employee_id,
+    employee_name,
+    0 as hierarchy_level, 
+    salary
+  from employees
+  where manager_id is null
+
+  union all
+
+  select 
+    e.employee_id,
+    e.employee_name,
+    h.hierarchy_level + 1 as hierarchy_level, 
+    e.salary - (select salary from employees where manager_id is null) as salary
+  from employees e
+  join hierarchy h on e.manager_id = h.employee_id
+)
+
+select 
+      employee_id as subordinate_id,
+      employee_name as subordinate_name,
+      hierarchy_level,
+      salary as salary_difference
+from hierarchy
+where hierarchy_level > 0 
+order by hierarchy_level, employee_id
