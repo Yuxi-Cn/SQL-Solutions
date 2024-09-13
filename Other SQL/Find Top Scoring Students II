@@ -1,0 +1,56 @@
+3188. Find Top Scoring Students II
+
+
+- Solution 1. T-SQL
+
+with mandatory_course as (
+    select 
+          c.major,
+          c.course_id
+    from courses c
+    where c.mandatory = 'Yes'
+)
+, elective_course as (
+    select 
+          c.major,
+          c.course_id
+    from courses c
+    where c.mandatory = 'No'
+)
+, student_mandatory as (
+    select 
+        e.student_id,
+        s.major
+    from enrollments e
+    join mandatory_course mc on e.course_id = mc.course_id
+    join students s on e.student_id = s.student_id and s.major = mc.major
+    where e.grade = 'A' 
+    group by e.student_id, s.major
+    having count(distinct e.course_id) = (select count(*) from mandatory_course where major = s.major)
+)
+, student_elective as (
+    select 
+        e.student_id,
+        s.major
+    from enrollments e
+    join elective_course ec on e.course_id = ec.course_id
+    join students s on e.student_id = s.student_id and s.major = ec.major
+    where e.grade in ('A', 'B')
+    group by e.student_id, s.major
+    having count(distinct e.course_id) > 1
+)
+, avg_gpa as (
+    select 
+          e.student_id, 
+          avg(e.GPA) as avg_gpa
+    from enrollments e
+    group by e.student_id
+    having avg(e.GPA) >= 2.5
+)
+
+select 
+      distinct sm.student_id
+from student_mandatory sm
+join student_elective se on sm.student_id = se.student_id
+join avg_gpa ag on sm.student_id = ag.student_id
+order by sm.student_id
