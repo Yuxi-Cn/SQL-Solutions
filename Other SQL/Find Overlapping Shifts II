@@ -1,0 +1,46 @@
+3268. Find Overlapping Shifts II
+
+
+- Solution 1. (T-SQL)
+
+with overlap_session as (
+    select
+          a.employee_id,
+          a.start_time as a_start,
+          a.end_time as a_end,
+          b.start_time as b_start,
+          b.end_time as b_end,
+          case
+            when a.start_time < b.start_time then b.start_time
+            else a.start_time
+          end as overlap_start,
+          case 
+            when a.end_time < b.end_time then a.end_time
+            else b.end_time
+          end as overlap_end
+    from EmployeeShifts a
+    left join EmployeeShifts b on a.employee_id = b.employee_id
+      and cast(a.start_time as date) = cast(b.start_time as date)
+      and b.start_time > a.start_time
+      and b.start_time < a.end_time
+)
+, count_and_duration as (
+    select 
+          employee_id,
+          a_start,
+          count(b_start) as overlapping_cnt,
+          isnull(
+            sum(
+                datediff(minute, overlap_start, overlap_end)
+            )
+          , 0) as total_overlap_duration
+    from overlap_session
+    group by employee_id, a_start, a_end
+)
+select 
+      employee_id,
+      isnull(max(overlapping_cnt) + 1, 1) as max_overlapping_shifts,
+      isnull(sum(total_overlap_duration), 0) as total_overlap_duration
+from count_and_duration
+group by employee_id
+order by employee_id
