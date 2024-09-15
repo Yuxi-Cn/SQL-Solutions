@@ -1,0 +1,23 @@
+3150. Invalid Tweets II
+
+
+- Solution 1. (T-SQL)
+
+select
+      tweet_id
+from Tweets
+where len(content) > 140
+   or len(content) - len(replace(content, '@', '')) > 3  
+   or len(content) - len(replace(content, '#', '')) > 3
+order by tweet_id
+
+
+- Solution 2. (PL/SQL)
+
+select 
+      tweet_id
+from Tweets
+where length(content) > 140
+   or regexp_count(content, '@') > 3
+   or regexp_count(content, '#') > 3
+order by tweet_id
