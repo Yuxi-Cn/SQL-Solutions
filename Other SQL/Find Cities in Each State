@@ -1,0 +1,11 @@
+3198. Find Cities in Each State
+
+
+- Solution 1. (T-SQL)
+
+select
+      state,
+      string_agg(city, ', ') within group (order by city) as cities
+from cities
+group by state
+order by state
