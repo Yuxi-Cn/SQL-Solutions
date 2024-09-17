@@ -1,0 +1,9 @@
+3246. Premier League Table Ranking
+
+select 
+      team_id,
+      team_name,
+      sum(wins * 3 + draws * 1) as points, 
+      rank() over(order by sum(wins * 3 + draws * 1) desc) as position
+from teamstats
+group by team_id, team_name
